@@ -9,7 +9,6 @@ import {
   UI_FILE_PATH,
 } from "./settings/index.js";
 import { LANG } from "./settings/lang.js";
-import { UserModel } from "./models/UserModel.js";
 import { ROUTES_WITHOUT_AUTHORIZATION } from "./settings/routes.js";
 import { serverPort } from "./settings/port.js";
 
