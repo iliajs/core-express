@@ -1,4 +1,4 @@
-export const getErrorText = (actionName, objectName) => {
+export const getSimpleErrorText = (actionName, objectName) => {
   return `Error ${actionName} ${objectName};`;
 };
 

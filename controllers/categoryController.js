@@ -1,15 +1,19 @@
 import { Category } from "../db/models/category.js";
-import { getErrorText, throwAndSendError } from "../helpers/api.js";
+import { getSimpleErrorText, throwAndSendError } from "../helpers/api.js";
 
 export const create = async (request, response) => {
   try {
     const { title } = request.body;
-    const data = await Category.create({ title });
-    response.send({ success: true, data });
+    const [data, isCreated] = await Category.findOrCreate({
+      where: { title },
+    });
+    isCreated
+      ? response.send({ success: true, data })
+      : response.status(409).send({ errorText: "Duplicate is found;" });
   } catch (error) {
     throwAndSendError({
       httpStatus: 500,
-      errorText: getErrorText("create", "category"),
+      errorText: getSimpleErrorText("create", "category"),
       error,
       response,
     });
@@ -28,7 +32,7 @@ export const destroy = async (request, response) => {
   } catch (error) {
     throwAndSendError({
       httpStatus: 500,
-      errorText: getErrorText("delete", "category"),
+      errorText: getSimpleErrorText("delete", "category"),
       error,
       response,
     });
@@ -42,7 +46,7 @@ export const list = async (request, response) => {
   } catch (error) {
     throwAndSendError({
       httpStatus: 500,
-      errorText: getErrorText("list", "categories"),
+      errorText: getSimpleErrorText("list", "categories"),
       error,
       response,
     });
