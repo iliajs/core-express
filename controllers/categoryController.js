@@ -22,13 +22,18 @@ export const create = async (request, response) => {
 
 export const destroy = async (request, response) => {
   try {
-    const { id } = request.query;
-    await Category.destroy({
-      where: {
-        id,
-      },
-    });
-    response.send({ success: true });
+    const { id } = request.params;
+    const data = await Category.findByPk(id);
+    if (data) {
+      await Category.destroy({
+        where: {
+          id,
+        },
+      });
+      response.send({ success: true });
+    } else {
+      response.sendStatus(404);
+    }
   } catch (error) {
     throwAndSendError({
       httpStatus: 500,
@@ -47,6 +52,21 @@ export const list = async (request, response) => {
     throwAndSendError({
       httpStatus: 500,
       errorText: getSimpleErrorText("list", "categories"),
+      error,
+      response,
+    });
+  }
+};
+
+export const show = async (request, response) => {
+  try {
+    const { id } = request.params;
+    const data = await Category.findByPk(id);
+    data ? response.send({ success: true, data }) : response.sendStatus(404);
+  } catch (error) {
+    throwAndSendError({
+      httpStatus: 500,
+      errorText: getSimpleErrorText("show", "category"),
       error,
       response,
     });
