@@ -19,4 +19,16 @@ export default class Orm {
       console.error("Unable to connect to the database; error:", error);
     }
   }
+
+  async sync() {
+    // Uncomment needed lines below to update database tables;
+    // Be carefully - it can be destructive for tables data; With { force: true } it removes all tables data for sure;
+    // Never use on production!
+
+    await this.instance.sync({ force: true });
+    console.log("db sync finished");
+
+    // Second variant with alter;
+    //await orm.sync({ alter: true });
+  }
 }

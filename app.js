@@ -13,9 +13,10 @@ import { ROUTES_WITHOUT_AUTHORIZATION } from "./settings/routes.js";
 import { serverPort } from "./settings/port.js";
 
 import "./db/models/index.js";
-import "./db/sync.js";
+import { ormObject } from "./db/connection.js";
 
 const app = express();
+await ormObject.sync();
 
 // Express configuration.
 app.use(express.static("public")); // Use the express-static middleware.
