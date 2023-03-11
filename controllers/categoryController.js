@@ -1,5 +1,7 @@
 import { Category } from "../db/models/category.js";
 import { getSimpleErrorText, throwAndSendError } from "../helpers/api.js";
+import { Op } from "sequelize";
+import lang from "../lang.js";
 
 export const create = async (request, response) => {
   try {
@@ -9,11 +11,43 @@ export const create = async (request, response) => {
     });
     isCreated
       ? response.send({ success: true, data })
-      : response.status(409).send({ errorText: "Duplicate is found;" });
+      : response.status(409).send({ errorText: lang.duplicateIsFound });
   } catch (error) {
     throwAndSendError({
       httpStatus: 500,
       errorText: getSimpleErrorText("create", "category"),
+      error,
+      response,
+    });
+  }
+};
+
+export const update = async (request, response) => {
+  try {
+    const { id } = request.params;
+    const { title } = request.body;
+
+    if (!(await Category.findByPk(id))) {
+      return response.sendStatus(404);
+    }
+
+    if (
+      await Category.findOne({
+        where: {
+          title,
+          id: { [Op.ne]: id },
+        },
+      })
+    ) {
+      return response.status(409).send({ errorText: lang.duplicateIsFound });
+    }
+
+    await Category.update({ title }, { where: { id } });
+    response.send({ success: true });
+  } catch (error) {
+    throwAndSendError({
+      httpStatus: 500,
+      errorText: getSimpleErrorText("update", "category"),
       error,
       response,
     });

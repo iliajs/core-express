@@ -25,7 +25,7 @@ export default class Orm {
     // Be carefully - it can be destructive for tables data; With { force: true } it removes all tables data for sure;
     // Never use on production!
 
-    await this.instance.sync({ force: true });
+    //await this.instance.sync({ force: true });
     console.log("db sync finished");
 
     // Second variant with alter;
