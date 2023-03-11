@@ -13,6 +13,7 @@ import { ROUTES_WITHOUT_AUTHORIZATION } from "./settings/routes.js";
 import { serverPort } from "./settings/port.js";
 
 import "./db/models/index.js";
+import "./db/sync.js";
 
 const app = express();
 

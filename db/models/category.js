@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { orm } from "../dbConnection.js";
+import { orm } from "../connection.js";
 
 export const Category = orm.define("category", {
   title: {
