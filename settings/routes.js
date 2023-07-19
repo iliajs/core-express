@@ -9,7 +9,8 @@ export const ROUTES = {
   CUSTOMERS: "/customers",
   CUSTOMER: "/customer",
   HI: "/hi",
-  CATEGORY: "/category",
+  WORD: "/word",
+  TRANSLATION: "/translation",
 };
 
 export const ROUTES_WITHOUT_AUTHORIZATION = [

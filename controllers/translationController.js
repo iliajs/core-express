@@ -1,38 +1,42 @@
-import { Category } from "../db/models/category.js";
-import { getSimpleErrorText, throwAndSendError } from "../helpers/api.js";
+import { wordModel } from "../db/models/wordModel.js";
+import { getSimpleErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
+import { translationModel } from "../db/models/translationModel.js";
+import { validationResult } from "express-validator";
 
+// TODO: It's from wordController, needed to be changed;
 export const create = async (request, response) => {
   try {
     const { title } = request.body;
-    const [data, isCreated] = await Category.findOrCreate({
+    const [data, isCreated] = await wordModel.findOrCreate({
       where: { title },
     });
     isCreated
       ? response.send({ success: true, data })
       : response.status(409).send({ errorText: lang.duplicateIsFound });
   } catch (error) {
-    throwAndSendError({
+    sendError({
       httpStatus: 500,
-      errorText: getSimpleErrorText("create", "category"),
+      errorText: getSimpleErrorText("create", "word"),
       error,
       response,
     });
   }
 };
 
+// TODO: It's from wordController, needed to be changed;
 export const update = async (request, response) => {
   try {
     const { id } = request.params;
     const { title } = request.body;
 
-    if (!(await Category.findByPk(id))) {
+    if (!(await wordModel.findByPk(id))) {
       return response.sendStatus(404);
     }
 
     if (
-      await Category.findOne({
+      await wordModel.findOne({
         where: {
           title,
           id: { [Op.ne]: id },
@@ -42,24 +46,25 @@ export const update = async (request, response) => {
       return response.status(409).send({ errorText: lang.duplicateIsFound });
     }
 
-    await Category.update({ title }, { where: { id } });
+    await wordModel.update({ title }, { where: { id } });
     response.send({ success: true });
   } catch (error) {
-    throwAndSendError({
+    sendError({
       httpStatus: 500,
-      errorText: getSimpleErrorText("update", "category"),
+      errorText: getSimpleErrorText("update", "word"),
       error,
       response,
     });
   }
 };
 
+// TODO: It's from wordController, needed to be changed;
 export const destroy = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await Category.findByPk(id);
+    const data = await wordModel.findByPk(id);
     if (data) {
-      await Category.destroy({
+      await wordModel.destroy({
         where: {
           id,
         },
@@ -69,9 +74,9 @@ export const destroy = async (request, response) => {
       response.sendStatus(404);
     }
   } catch (error) {
-    throwAndSendError({
+    sendError({
       httpStatus: 500,
-      errorText: getSimpleErrorText("delete", "category"),
+      errorText: getSimpleErrorText("delete", "word"),
       error,
       response,
     });
@@ -79,28 +84,47 @@ export const destroy = async (request, response) => {
 };
 
 export const list = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
+  const wordId = request.query.wordId;
+
+  if (!(await wordModel.findByPk(wordId))) {
+    return response
+      .status(404)
+      .send({ error: `Cannot find word with id=${wordId}` });
+  }
+
   try {
-    const data = await Category.findAll();
+    const data = await translationModel.findAll({
+      where: {
+        wordId: wordId,
+      },
+    });
+
     response.send({ success: true, data });
   } catch (error) {
-    throwAndSendError({
+    return sendError({
       httpStatus: 500,
-      errorText: getSimpleErrorText("list", "categories"),
+      errorText: getSimpleErrorText("list", "translations"),
       error,
       response,
     });
   }
 };
 
+// TODO: It's from wordController, needed to be changed;
 export const show = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await Category.findByPk(id);
+    const data = await wordModel.findByPk(id);
     data ? response.send({ success: true, data }) : response.sendStatus(404);
   } catch (error) {
-    throwAndSendError({
+    sendError({
       httpStatus: 500,
-      errorText: getSimpleErrorText("show", "category"),
+      errorText: getSimpleErrorText("show", "word"),
       error,
       response,
     });

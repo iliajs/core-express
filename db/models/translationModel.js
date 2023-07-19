@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { orm } from "../connection.js";
 
-export const Expense = orm.define("expense", {
+export const translationModel = orm.define("translation", {
   value: {
     type: DataTypes.FLOAT,
     allowNull: false,

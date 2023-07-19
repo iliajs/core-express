@@ -1,0 +1,1 @@
+scp -r ./.env.production iliatech@hello.iliatech.ru:/var/www/i2a-finance-express.iliatech.ru/
