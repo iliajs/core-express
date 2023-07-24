@@ -1,24 +1,35 @@
 import { wordModel } from "../db/models/wordModel.js";
-import { getSimpleErrorText, sendError } from "../helpers/api.js";
+import { unknownErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
 import { translationModel } from "../db/models/translationModel.js";
 import { validationResult } from "express-validator";
 
-// TODO: It's from wordController, needed to be changed;
 export const create = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
+  const wordId = request.query.wordId;
+
+  if (!(await wordModel.findByPk(wordId))) {
+    return response
+      .status(404)
+      .send({ error: `Cannot find word with id=${wordId}` });
+  }
+
   try {
-    const { title } = request.body;
-    const [data, isCreated] = await wordModel.findOrCreate({
-      where: { title },
+    const text = request.body?.text.trim();
+    const [data, isCreated] = await translationModel.findOrCreate({
+      where: { text, wordId },
     });
     isCreated
       ? response.send({ success: true, data })
       : response.status(409).send({ errorText: lang.duplicateIsFound });
   } catch (error) {
     sendError({
-      httpStatus: 500,
-      errorText: getSimpleErrorText("create", "word"),
+      errorText: unknownErrorText("create", "translation"),
       error,
       response,
     });
@@ -50,8 +61,7 @@ export const update = async (request, response) => {
     response.send({ success: true });
   } catch (error) {
     sendError({
-      httpStatus: 500,
-      errorText: getSimpleErrorText("update", "word"),
+      errorText: unknownErrorText("update", "word"),
       error,
       response,
     });
@@ -75,8 +85,7 @@ export const destroy = async (request, response) => {
     }
   } catch (error) {
     sendError({
-      httpStatus: 500,
-      errorText: getSimpleErrorText("delete", "word"),
+      errorText: unknownErrorText("delete", "word"),
       error,
       response,
     });
@@ -107,8 +116,7 @@ export const list = async (request, response) => {
     response.send({ success: true, data });
   } catch (error) {
     return sendError({
-      httpStatus: 500,
-      errorText: getSimpleErrorText("list", "translations"),
+      errorText: unknownErrorText("list", "translations"),
       error,
       response,
     });
@@ -123,8 +131,7 @@ export const show = async (request, response) => {
     data ? response.send({ success: true, data }) : response.sendStatus(404);
   } catch (error) {
     sendError({
-      httpStatus: 500,
-      errorText: getSimpleErrorText("show", "word"),
+      errorText: unknownErrorText("show", "word"),
       error,
       response,
     });

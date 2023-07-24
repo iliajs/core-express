@@ -5,7 +5,10 @@ import {
   list as listWord,
   show as showWord,
 } from "../controllers/wordController.js";
-import { list as listTranslation } from "../controllers/translationController.js";
+import {
+  list as listTranslation,
+  create as createTranslation,
+} from "../controllers/translationController.js";
 import { ROUTES } from "../settings/routes.js";
 import { hi } from "../controllers/hi.js";
 import { query } from "express-validator";
@@ -22,5 +25,11 @@ export const router = (app) => {
     ROUTES.TRANSLATION,
     query("wordId").notEmpty().isNumeric(),
     listTranslation
+  );
+
+  app.post(
+    ROUTES.TRANSLATION,
+    query("wordId").notEmpty().isNumeric(),
+    createTranslation
   );
 };
