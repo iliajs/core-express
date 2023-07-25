@@ -21,12 +21,8 @@ export const create = async (request, response) => {
 
   try {
     const text = request.body?.text.trim();
-    const [data, isCreated] = await translationModel.findOrCreate({
-      where: { text, wordId },
-    });
-    isCreated
-      ? response.send({ success: true, data })
-      : response.status(409).send({ errorText: lang.duplicateIsFound });
+    const data = await translationModel.create({ text, wordId });
+    response.send({ success: true, data });
   } catch (error) {
     sendError({
       errorText: unknownErrorText("create", "translation"),

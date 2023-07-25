@@ -2,6 +2,7 @@ import { wordModel } from "../db/models/wordModel.js";
 import { unknownErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
+import { translationModel } from "../db/models/translationModel.js";
 
 export const create = async (request, response) => {
   try {
@@ -77,7 +78,7 @@ export const destroy = async (request, response) => {
 
 export const list = async (request, response) => {
   try {
-    const data = await wordModel.findAll();
+    const data = await wordModel.findAll({ include: translationModel });
     response.send({ success: true, data });
   } catch (error) {
     sendError({
