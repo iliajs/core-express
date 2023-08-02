@@ -11,6 +11,8 @@ export const ROUTES = {
   HI: "/hi",
   WORD: "/word",
   TRANSLATION: "/translation",
+  GOOGLE_DRIVE: "/google-drive",
+  CREDENTIAL: "/credential",
 };
 
 export const ROUTES_WITHOUT_AUTHORIZATION = [

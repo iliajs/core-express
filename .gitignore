@@ -1,5 +1,6 @@
 .env
 .env.production
+.google_drive_service.json
 
 \.idea
 node_modules
