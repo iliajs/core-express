@@ -11,14 +11,14 @@ export const save = async (request, response) => {
   }
 
   const yesterday = addDays(new Date(), -1);
-  const yesterdayFrom = format(yesterday, "yyyy-MM-dd 00:00");
-  const yesterdayTo = format(yesterday, "yyyy-MM-dd 23:59");
+  const yesterdayStart = format(yesterday, "yyyy-MM-dd 00:00");
+  const yesterdayEnd = format(yesterday, "yyyy-MM-dd 23:59");
 
   try {
-    const backup = await credentialModel.findOne({
+    const yesterdayBackup = await credentialModel.findOne({
       where: {
         createdAt: {
-          [Op.between]: [yesterdayFrom, yesterdayTo],
+          [Op.between]: [yesterdayStart, yesterdayEnd],
         },
         type: {
           [Op.not]: credentialRecordTypes.main,
@@ -26,9 +26,9 @@ export const save = async (request, response) => {
       },
     });
 
-    console.log(3, backup);
+    let isBackupCreated = false;
 
-    if (!backup) {
+    if (!yesterdayBackup) {
       const main = await credentialModel.findOne({
         where: {
           type: credentialRecordTypes.main,
@@ -39,18 +39,17 @@ export const save = async (request, response) => {
       delete main.id;
       main.type = credentialRecordTypes.backup;
 
-      console.log(4, main);
-
       if (main) {
-        const createBackup = await credentialModel.create(main);
-        console.log(5, createBackup);
+        await credentialModel.create(main);
+        isBackupCreated = true;
       }
     }
-    console.log(1, yesterdayFrom);
-    console.log(2, yesterdayTo);
-    return response.status(200).json({ success: true });
+
+    return response.status(200).json({ success: true, isBackupCreated });
   } catch (e) {
-    console.error("my own error", e);
+    response
+      .status(500)
+      .json({ errorText: "Error when try to check/create backup" });
   }
 
   const { data } = request.body;
@@ -69,6 +68,8 @@ export const save = async (request, response) => {
 
     response.status(200).json({ success: true });
   } catch (e) {
-    response.status(500).json({ error: "Error when save credential" });
+    response
+      .status(500)
+      .json({ errorText: "Error when try to save credential" });
   }
 };
