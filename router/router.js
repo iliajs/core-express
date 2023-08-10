@@ -1,3 +1,5 @@
+import user from "../controllers/user.js";
+
 import {
   create as createWord,
   update as updateWord,
@@ -15,25 +17,44 @@ import {
   list as listTranslation,
   create as createTranslation,
 } from "../controllers/translationController.js";
+
 import { routes } from "../settings/routes.js";
-import { hi } from "../controllers/hi.js";
-import { body, query } from "express-validator";
+import { system } from "../controllers/system.js";
+import { body, param, query } from "express-validator";
 import { upload } from "../controllers/googleDrive.js";
 
 export const router = (app) => {
-  app.get(routes.hi, hi);
+  // System.
+  app.get(routes.system, system);
   app.post(routes.googleDrive, upload);
 
-  app.get(routes.credentials, getCredentials);
+  // User.
+  app.get(routes.users, user.list);
+  app.get(`${routes.users}/:id`, [param("id").exists().toInt()], user.show);
+  app.post(
+    routes.users,
+    [
+      body("username").notEmpty(),
+      body("email").isEmail(),
+      body("firstName").notEmpty(),
+      body("lastName").notEmpty(),
+      body("password").notEmpty(),
+    ],
+    user.create
+  );
+
+  // Credential.
+  app.get(routes.credentials, body("username").notEmpty(), getCredentials);
   app.post(routes.credentials, body("data").notEmpty(), saveCredentials);
 
-  app.post(routes.words, createWord);
+  // Word.
+  app.get(routes.words, listWord);
+  app.get(`${routes.words}/:id`, showWord);
   app.post(routes.words, createWord);
   app.post(`${routes.words}/:id`, updateWord);
   app.delete(`${routes.words}/:id`, destroyWord);
-  app.get(routes.words, listWord);
-  app.get(`${routes.words}/:id`, showWord);
 
+  // Translation.
   app.get(
     routes.translations,
     query("wordId").notEmpty().isNumeric(),

@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 
 import { TelegramProcessing } from "./classes/TelegramProcessing.js";
-import { router } from "./router/index.js";
+import { router } from "./router/router.js";
 import {
   TELEGRAM_UPDATE_INTERVAL,
   TELEGRAM_UPDATE_METHODS,

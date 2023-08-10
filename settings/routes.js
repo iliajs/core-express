@@ -1,14 +1,10 @@
 export const routes = {
-  ROOT: "/",
-  FAVICON: "/favicon.ico",
-  AUTH_WITH_ONE_TIME_TOKEN: "/auth-with-one-time-token",
-  TELEGRAM_WEBHOOK: `/telegram-web-hook/${process.env.TELEGRAM_WEBHOOK_SECRET}`,
-  APPOINTMENT: "/appointment",
-  APPOINTMENT_RESULT: "/appointment_result",
-  APPOINTMENTS: "/appointments",
-  CUSTOMERS: "/customers",
-  CUSTOMER: "/customer",
-  hi: "/hi",
+  system: "/system",
+  root: "/",
+  favicon: "/favicon.ico",
+  users: "/users",
+  auth_with_one_time_token: "/auth-with-one-time-token",
+  telegram_webhook: `/telegram-web-hook/${process.env.TELEGRAM_WEBHOOK_SECRET}`,
   words: "/word",
   translations: "/translation",
   googleDrive: "/google-drive",
@@ -16,8 +12,8 @@ export const routes = {
 };
 
 export const ROUTES_WITHOUT_AUTHORIZATION = [
-  routes.ROOT,
-  routes.FAVICON,
-  routes.AUTH_WITH_ONE_TIME_TOKEN,
-  routes.TELEGRAM_WEBHOOK,
+  routes.root,
+  routes.favicon,
+  routes.auth_with_one_time_token,
+  routes.telegram_webhook,
 ];

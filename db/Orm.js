@@ -21,9 +21,8 @@ export default class Orm {
   }
 
   async sync() {
-    // Uncomment needed lines below to update database tables;
-    // Be carefully - it can be destructive for tables data; With { force: true } it removes all tables data for sure;
-    // Never use on production!
+    // Needed to update tables structure.
+    // It will delete all the data in all the tables!
 
     //await this.instance.sync({ force: true });
     console.log("db sync finished");
