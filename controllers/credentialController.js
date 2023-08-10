@@ -4,6 +4,16 @@ import { validationResult } from "express-validator";
 import { Op } from "sequelize";
 import { addDays, format } from "date-fns";
 
+export const get = async (request, response) => {
+  const data = await credentialModel.findOne({
+    where: {
+      type: credentialRecordTypes.main,
+    },
+  });
+
+  return response.status(200).json({ success: true, data });
+};
+
 export const save = async (request, response) => {
   const validator = validationResult(request);
   if (!validator.isEmpty()) {
@@ -14,19 +24,17 @@ export const save = async (request, response) => {
   const yesterdayStart = format(yesterday, "yyyy-MM-dd 00:00");
   const yesterdayEnd = format(yesterday, "yyyy-MM-dd 23:59");
 
+  let isBackupCreated = false;
+
   try {
     const yesterdayBackup = await credentialModel.findOne({
       where: {
         createdAt: {
           [Op.between]: [yesterdayStart, yesterdayEnd],
         },
-        type: {
-          [Op.not]: credentialRecordTypes.main,
-        },
+        type: credentialRecordTypes.backup,
       },
     });
-
-    let isBackupCreated = false;
 
     if (!yesterdayBackup) {
       const main = await credentialModel.findOne({
@@ -38,14 +46,13 @@ export const save = async (request, response) => {
 
       delete main.id;
       main.type = credentialRecordTypes.backup;
+      main.createdAt = yesterdayStart;
 
       if (main) {
         await credentialModel.create(main);
         isBackupCreated = true;
       }
     }
-
-    return response.status(200).json({ success: true, isBackupCreated });
   } catch (e) {
     response
       .status(500)
@@ -66,7 +73,7 @@ export const save = async (request, response) => {
       }
     );
 
-    response.status(200).json({ success: true });
+    response.status(200).json({ isUpdated: true, isBackupCreated });
   } catch (e) {
     response
       .status(500)
