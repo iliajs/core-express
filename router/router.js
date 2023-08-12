@@ -1,17 +1,6 @@
+import credential from "../controllers/credential.js";
 import user from "../controllers/user.js";
-
-import {
-  create as createWord,
-  update as updateWord,
-  destroy as destroyWord,
-  list as listWord,
-  show as showWord,
-} from "../controllers/wordController.js";
-
-import {
-  save as saveCredentials,
-  get as getCredentials,
-} from "../controllers/credentialController.js";
+import word from "../controllers/word.js";
 
 import {
   list as listTranslation,
@@ -29,10 +18,10 @@ export const router = (app) => {
   app.post(routes.googleDrive, upload);
 
   // User.
-  app.get(routes.users, user.list);
-  app.get(`${routes.users}/:id`, [param("id").exists().toInt()], user.show);
+  app.get(routes.user, user.list);
+  app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show);
   app.post(
-    routes.users,
+    routes.user,
     [
       body("username").notEmpty(),
       body("email").isEmail(),
@@ -44,25 +33,25 @@ export const router = (app) => {
   );
 
   // Credential.
-  app.get(routes.credentials, body("username").notEmpty(), getCredentials);
-  app.post(routes.credentials, body("data").notEmpty(), saveCredentials);
+  app.get(routes.credential, body("username").notEmpty(), credential.get);
+  app.put(routes.credential, body("data").notEmpty(), credential.update);
 
   // Word.
-  app.get(routes.words, listWord);
-  app.get(`${routes.words}/:id`, showWord);
-  app.post(routes.words, createWord);
-  app.post(`${routes.words}/:id`, updateWord);
-  app.delete(`${routes.words}/:id`, destroyWord);
+  app.get(routes.word, word.list);
+  app.get(`${routes.word}/:id`, word.show);
+  app.post(routes.word, word.create);
+  app.post(`${routes.word}/:id`, word.update);
+  app.delete(`${routes.word}/:id`, word.destroy);
 
   // Translation.
   app.get(
-    routes.translations,
+    routes.translation,
     query("wordId").notEmpty().isNumeric(),
     listTranslation
   );
 
   app.post(
-    routes.translations,
+    routes.translation,
     query("wordId").notEmpty().isNumeric(),
     createTranslation
   );

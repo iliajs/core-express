@@ -4,7 +4,34 @@ import { Op } from "sequelize";
 import lang from "../lang.js";
 import { translationModel } from "../db/models/translationModel.js";
 
-export const create = async (request, response) => {
+const list = async (request, response) => {
+  try {
+    const data = await wordModel.findAll({ include: translationModel });
+    response.send({ success: true, data });
+  } catch (error) {
+    sendError({
+      errorText: unknownErrorText("list", "categories"),
+      error,
+      response,
+    });
+  }
+};
+
+const show = async (request, response) => {
+  try {
+    const { id } = request.params;
+    const data = await wordModel.findByPk(id);
+    data ? response.send({ success: true, data }) : response.sendStatus(404);
+  } catch (error) {
+    sendError({
+      errorText: unknownErrorText("show", "word"),
+      error,
+      response,
+    });
+  }
+};
+
+const create = async (request, response) => {
   try {
     const { title } = request.body;
     const [data, isCreated] = await wordModel.findOrCreate({
@@ -22,7 +49,7 @@ export const create = async (request, response) => {
   }
 };
 
-export const update = async (request, response) => {
+const update = async (request, response) => {
   try {
     const { id } = request.params;
     const { title } = request.body;
@@ -53,7 +80,7 @@ export const update = async (request, response) => {
   }
 };
 
-export const destroy = async (request, response) => {
+const destroy = async (request, response) => {
   try {
     const { id } = request.params;
     const data = await wordModel.findByPk(id);
@@ -76,29 +103,4 @@ export const destroy = async (request, response) => {
   }
 };
 
-export const list = async (request, response) => {
-  try {
-    const data = await wordModel.findAll({ include: translationModel });
-    response.send({ success: true, data });
-  } catch (error) {
-    sendError({
-      errorText: unknownErrorText("list", "categories"),
-      error,
-      response,
-    });
-  }
-};
-
-export const show = async (request, response) => {
-  try {
-    const { id } = request.params;
-    const data = await wordModel.findByPk(id);
-    data ? response.send({ success: true, data }) : response.sendStatus(404);
-  } catch (error) {
-    sendError({
-      errorText: unknownErrorText("show", "word"),
-      error,
-      response,
-    });
-  }
-};
+export default { list, show, create, update, destroy };

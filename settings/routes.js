@@ -1,14 +1,25 @@
 export const routes = {
-  system: "/system",
+  // System.
   root: "/",
+  system: "/system",
   favicon: "/favicon.ico",
-  users: "/users",
+
+  // Auth.
   auth_with_one_time_token: "/auth-with-one-time-token",
+  user: "/user",
+
+  // Telegram.
   telegram_webhook: `/telegram-web-hook/${process.env.TELEGRAM_WEBHOOK_SECRET}`,
-  words: "/word",
-  translations: "/translation",
+
+  // Google drive.
   googleDrive: "/google-drive",
-  credentials: "/credentials",
+
+  // Credential.
+  credential: "/credential",
+
+  // Word.
+  word: "/word",
+  translation: "/translation",
 };
 
 export const ROUTES_WITHOUT_AUTHORIZATION = [
