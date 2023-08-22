@@ -1,36 +1,46 @@
+import auth from "../controllers/auth.js";
 import credential from "../controllers/credential.js";
+import googleDrive from "../controllers/googleDrive.js";
+import system from "../controllers/system.js";
+import translation from "../controllers/translation.js";
 import user from "../controllers/user.js";
 import word from "../controllers/word.js";
 
-import {
-  list as listTranslation,
-  create as createTranslation,
-} from "../controllers/translationController.js";
-
 import { routes } from "../settings/routes.js";
-import { system } from "../controllers/system.js";
+
 import { body, param, query } from "express-validator";
-import { upload } from "../controllers/googleDrive.js";
 
 export const router = (app) => {
   // System.
-  app.get(routes.system, system);
-  app.post(routes.googleDrive, upload);
+  app.get(routes.system, system.info);
+  app.post(routes.googleDrive, googleDrive.upload);
 
-  // User.
-  app.get(routes.user, user.list);
-  app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show);
+  // Register.
   app.post(
-    routes.user,
+    routes.register,
     [
-      body("username").notEmpty(),
+      body("username").notEmpty(), // TODO add trim here and for 4 lines below
       body("email").isEmail(),
       body("firstName").notEmpty(),
       body("lastName").notEmpty(),
       body("password").notEmpty(),
     ],
-    user.create
+    auth.register
   );
+
+  // Login.
+  app.post(
+    routes.login,
+    [
+      body("data").isLength({ min: 2, max: 50 }),
+      body("password").isStrongPassword({ minSymbols: 0 }),
+    ],
+    auth.login
+  );
+
+  // User.
+  app.get(routes.user, user.list);
+  app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show);
 
   // Credential.
   app.get(routes.credential, body("username").notEmpty(), credential.get);
@@ -47,12 +57,12 @@ export const router = (app) => {
   app.get(
     routes.translation,
     query("wordId").notEmpty().isNumeric(),
-    listTranslation
+    translation.list
   );
 
   app.post(
     routes.translation,
     query("wordId").notEmpty().isNumeric(),
-    createTranslation
+    translation.create
   );
 };

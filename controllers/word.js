@@ -1,12 +1,12 @@
-import { wordModel } from "../db/models/wordModel.js";
+import { Word } from "../db/models/Word.js";
 import { unknownErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
-import { translationModel } from "../db/models/translationModel.js";
+import { Translation } from "../db/models/Translation.js";
 
 const list = async (request, response) => {
   try {
-    const data = await wordModel.findAll({ include: translationModel });
+    const data = await Word.findAll({ include: Translation });
     response.send({ success: true, data });
   } catch (error) {
     sendError({
@@ -20,7 +20,7 @@ const list = async (request, response) => {
 const show = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await wordModel.findByPk(id);
+    const data = await Word.findByPk(id);
     data ? response.send({ success: true, data }) : response.sendStatus(404);
   } catch (error) {
     sendError({
@@ -34,7 +34,7 @@ const show = async (request, response) => {
 const create = async (request, response) => {
   try {
     const { title } = request.body;
-    const [data, isCreated] = await wordModel.findOrCreate({
+    const [data, isCreated] = await Word.findOrCreate({
       where: { title },
     });
     isCreated
@@ -54,12 +54,12 @@ const update = async (request, response) => {
     const { id } = request.params;
     const { title } = request.body;
 
-    if (!(await wordModel.findByPk(id))) {
+    if (!(await Word.findByPk(id))) {
       return response.sendStatus(404);
     }
 
     if (
-      await wordModel.findOne({
+      await Word.findOne({
         where: {
           title,
           id: { [Op.ne]: id },
@@ -69,7 +69,7 @@ const update = async (request, response) => {
       return response.status(409).send({ errorText: lang.duplicateIsFound });
     }
 
-    await wordModel.update({ title }, { where: { id } });
+    await Word.update({ title }, { where: { id } });
     response.send({ success: true });
   } catch (error) {
     sendError({
@@ -83,9 +83,9 @@ const update = async (request, response) => {
 const destroy = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await wordModel.findByPk(id);
+    const data = await Word.findByPk(id);
     if (data) {
-      await wordModel.destroy({
+      await Word.destroy({
         where: {
           id,
         },

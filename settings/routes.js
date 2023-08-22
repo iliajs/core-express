@@ -5,7 +5,11 @@ export const routes = {
   favicon: "/favicon.ico",
 
   // Auth.
-  auth_with_one_time_token: "/auth-with-one-time-token",
+  auth_with_one_time_token: "/auth-with-one-time-token", // TODO
+  register: "/register",
+  login: "/login",
+
+  // User.
   user: "/user",
 
   // Telegram.

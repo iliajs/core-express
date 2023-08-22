@@ -1,9 +1,9 @@
-import { wordModel } from "./wordModel.js";
-import { translationModel } from "./translationModel.js";
+import { Word } from "./Word.js";
+import { Translation } from "./Translation.js";
 
-wordModel.hasMany(translationModel, {
+Word.hasMany(Translation, {
   foreignKey: {
     allowNull: false,
   },
 });
-translationModel.belongsTo(wordModel);
+Translation.belongsTo(Word);

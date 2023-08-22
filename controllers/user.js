@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
-import { User } from "../db/models/user.js";
+import { User } from "../db/models/User.js";
 import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 
 const list = async (request, response) => {
