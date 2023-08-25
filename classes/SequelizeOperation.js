@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 
-export default class Orm {
+export default class SequelizeOperation {
   instance;
 
   constructor() {
@@ -21,13 +21,12 @@ export default class Orm {
   }
 
   async sync() {
-    // Needed to update tables structure.
-    // It will delete all the data in all the tables!
+    // (!) Needed to update tables structure. It will delete all the data in all the tables.
 
-    //await this.instance.sync({ force: true });
+    await this.instance.sync({ force: true });
     console.log("db sync finished");
 
     // Second variant with alter;
-    //await orm.sync({ alter: true });
+    //await sequelizeInstance.sync({ alter: true });
   }
 }

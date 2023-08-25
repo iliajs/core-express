@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { orm } from "../connection.js";
+import { sequelizeInstance } from "../connection.js";
 
-export const Word = orm.define("word", {
+export const Word = sequelizeInstance.define("word", {
   title: {
     type: DataTypes.STRING,
     allowNull: false,

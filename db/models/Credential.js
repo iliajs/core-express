@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { orm } from "../connection.js";
+import { sequelizeInstance } from "../connection.js";
 
-export const Credential = orm.define("credential", {
+export const Credential = sequelizeInstance.define("credential", {
   type: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { orm } from "../connection.js";
+import { sequelizeInstance } from "../connection.js";
 
-export const Translation = orm.define("translation", {
+export const Translation = sequelizeInstance.define("translation", {
   text: {
     type: DataTypes.CHAR(1000),
     allowNull: false,

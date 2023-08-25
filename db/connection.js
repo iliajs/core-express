@@ -1,5 +1,8 @@
-import Orm from "./Orm.js";
+import SequelizeOperation from "../classes/SequelizeOperation.js";
 
-export const ormObject = new Orm();
-await ormObject.connect();
-export const orm = ormObject.instance;
+const sequelizeOperation = new SequelizeOperation();
+const sequelizeInstance = sequelizeOperation.instance;
+
+await sequelizeOperation.connect();
+
+export { sequelizeOperation, sequelizeInstance };

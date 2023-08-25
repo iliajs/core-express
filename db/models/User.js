@@ -1,9 +1,14 @@
 import { DataTypes } from "sequelize";
-import { orm } from "../connection.js";
+import { sequelizeInstance } from "../connection.js";
 
-export const User = orm.define(
+export const User = sequelizeInstance.define(
   "user",
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,

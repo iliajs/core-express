@@ -6,4 +6,5 @@ Word.hasMany(Translation, {
     allowNull: false,
   },
 });
+
 Translation.belongsTo(Word);
