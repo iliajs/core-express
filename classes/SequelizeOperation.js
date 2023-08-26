@@ -14,7 +14,7 @@ export default class SequelizeOperation {
       await this.instance.authenticate();
       await this.updateDatabaseStructure();
     } catch (error) {
-      console.error("Unable to connect to the database; error:", error);
+      console.error("Sequelize cannot connect to database", error);
     }
   }
 
@@ -24,9 +24,6 @@ export default class SequelizeOperation {
     }
     const options = {
       force: true,
-
-      // TODO: Try to use instead of "force", probably, it's more safety?
-      //{ alter: true }
     };
 
     await this.instance.sync(options);

@@ -1,5 +1,5 @@
-import { Word } from "./Word.js";
-import { Translation } from "./Translation.js";
+import { Word } from "./models/Word.js";
+import { Translation } from "./models/Translation.js";
 
 Word.hasMany(Translation, {
   foreignKey: {

@@ -16,6 +16,7 @@ const show = async (request, response) => {
 
 const create = async (request, response) => {
   const validator = validationResult(request);
+
   if (!validator.isEmpty()) {
     return response.status(403).json({ errors: validator.array() });
   }

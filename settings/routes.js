@@ -26,7 +26,7 @@ export const routes = {
   translation: "/translation",
 };
 
-export const ROUTES_WITHOUT_AUTHORIZATION = [
+export const routesWithoutAuthorization = [
   routes.root,
   routes.favicon,
   routes.auth_with_one_time_token,

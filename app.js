@@ -1,26 +1,28 @@
 import "dotenv/config";
 import express from "express";
 
-import "./db/models/index.js";
+import "./db/relations.js";
 import { sequelizeOperation } from "./db/sequelize.js";
 import { router } from "./router/router.js";
 
-import { TelegramProcessing } from "./classes/TelegramProcessing.js";
+import { routesWithoutAuthorization } from "./settings/routes.js";
+import { serverPort } from "./settings/port.js";
 
+// TODO: Let's restore telegram functionality.
+import { TelegramProcessing } from "./classes/TelegramProcessing.js";
 import {
   TELEGRAM_UPDATE_INTERVAL,
   TELEGRAM_UPDATE_METHODS,
   UI_FILE_PATH,
 } from "./settings/index.js";
-import { ROUTES_WITHOUT_AUTHORIZATION } from "./settings/routes.js";
-import { serverPort } from "./settings/port.js";
+
 import { showServerInfo } from "./helpers/logs.js";
 
+// Database.
 await sequelizeOperation.connect();
 
+// Express.
 const app = express();
-
-// Express configuration.
 app.use(express.static("public")); // Use the express-static middleware.
 app.use(express.static(UI_FILE_PATH));
 app.use(express.json()); // To support JSON-encoded bodies.
@@ -45,8 +47,7 @@ app.use(async function (request, response, next) {
     return next();
   }
 
-  if (!ROUTES_WITHOUT_AUTHORIZATION.includes(request.url)) {
-    console.log("no");
+  if (!routesWithoutAuthorization.includes(request.url)) {
     // TODO Send 403? status when token is not presented or incorrect
     // if (!request.headers['authorization']) {
     //   // TODO Enable authorization check for production.
@@ -70,7 +71,6 @@ app.use(async function (request, response, next) {
     //   return next();
     // }
   } else {
-    console.log();
     return next();
   }
 });
