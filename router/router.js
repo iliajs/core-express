@@ -38,22 +38,22 @@ export const router = (app) => {
     auth.login
   );
 
-  // User.
+  // Users.
   app.get(routes.user, user.list);
   app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show);
 
-  // Credential.
+  // Credentials.
   app.get(routes.credential, body("username").notEmpty(), credential.get);
   app.put(routes.credential, body("data").notEmpty(), credential.update);
 
-  // Word.
+  // Words.
   app.get(routes.word, word.list);
   app.get(`${routes.word}/:id`, word.show);
   app.post(routes.word, word.create);
   app.post(`${routes.word}/:id`, word.update);
   app.delete(`${routes.word}/:id`, word.destroy);
 
-  // Translation.
+  // Translations.
   app.get(
     routes.translation,
     query("wordId").notEmpty().isNumeric(),

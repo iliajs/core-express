@@ -4,9 +4,7 @@ export default class SequelizeOperation {
   instance;
 
   constructor() {
-    this.instance = new Sequelize(
-      `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_BASE}`
-    );
+    this.instance = new Sequelize(process.env.POSTGRES_CONNECTION_STRING);
   }
 
   async connect() {
