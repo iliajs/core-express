@@ -12,21 +12,23 @@ export default class SequelizeOperation {
   async connect() {
     try {
       await this.instance.authenticate();
-      console.log(
-        "Connection to the database has been established successfully;"
-      );
+      await this.updateDatabaseStructure();
     } catch (error) {
       console.error("Unable to connect to the database; error:", error);
     }
   }
 
-  async sync() {
-    // (!) Needed to update tables structure. It will delete all the data in all the tables.
+  async updateDatabaseStructure() {
+    if (process.env.REMOVE_ALL_DATABASE_DATA !== "true") {
+      return;
+    }
+    const options = {
+      force: true,
 
-    await this.instance.sync({ force: true });
-    console.log("db sync finished");
+      // TODO: Try to use instead of "force", probably, it's more safety?
+      //{ alter: true }
+    };
 
-    // Second variant with alter;
-    //await sequelizeInstance.sync({ alter: true });
+    await this.instance.sync(options);
   }
 }

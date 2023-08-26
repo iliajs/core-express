@@ -1,8 +1,7 @@
 import SequelizeOperation from "../classes/SequelizeOperation.js";
 
 const sequelizeOperation = new SequelizeOperation();
-const sequelizeInstance = sequelizeOperation.instance;
 
-await sequelizeOperation.connect();
+const sequelizeInstance = sequelizeOperation.instance;
 
 export { sequelizeOperation, sequelizeInstance };

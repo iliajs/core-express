@@ -1,22 +1,24 @@
 import "dotenv/config";
 import express from "express";
 
-import { TelegramProcessing } from "./classes/TelegramProcessing.js";
+import "./db/models/index.js";
+import { sequelizeOperation } from "./db/sequelize.js";
 import { router } from "./router/router.js";
+
+import { TelegramProcessing } from "./classes/TelegramProcessing.js";
+
 import {
   TELEGRAM_UPDATE_INTERVAL,
   TELEGRAM_UPDATE_METHODS,
   UI_FILE_PATH,
 } from "./settings/index.js";
-import { LANG } from "./settings/lang.js";
 import { ROUTES_WITHOUT_AUTHORIZATION } from "./settings/routes.js";
 import { serverPort } from "./settings/port.js";
+import { showServerInfo } from "./helpers/logs.js";
 
-import "./db/models/index.js";
-import { sequelizeOperation } from "./db/connection.js";
+await sequelizeOperation.connect();
 
 const app = express();
-await sequelizeOperation.sync();
 
 // Express configuration.
 app.use(express.static("public")); // Use the express-static middleware.
@@ -73,8 +75,7 @@ app.use(async function (request, response, next) {
   }
 });
 
-// Run node.js server on port with router;
-app.listen(serverPort, () => console.log(LANG.serverIsRunning(serverPort)));
+app.listen(serverPort, () => showServerInfo());
 router(app);
 
 // Process telegram updates with long-polling.
