@@ -12,7 +12,7 @@ import { serverPort } from "./settings/port.js";
 import { TelegramProcessing } from "./classes/TelegramProcessing.js";
 import {
   TELEGRAM_UPDATE_INTERVAL,
-  TELEGRAM_UPDATE_METHODS,
+  telegramUpdateMethods,
   UI_FILE_PATH,
 } from "./settings/index.js";
 
@@ -79,9 +79,7 @@ app.listen(serverPort, () => showServerInfo());
 router(app);
 
 // Process telegram updates with long-polling.
-if (
-  process.env.TELEGRAM_UPDATE_METHOD === TELEGRAM_UPDATE_METHODS.longPolling
-) {
+if (process.env.TELEGRAM_UPDATE_METHOD === telegramUpdateMethods.longPolling) {
   const telegramProcessing = new TelegramProcessing();
   await telegramProcessing.process();
   setInterval(

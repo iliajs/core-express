@@ -4,10 +4,11 @@ export const routes = {
   system: "/system",
   favicon: "/favicon.ico",
 
-  // Auth.
+  // Authentication & authorization.
   auth_with_one_time_token: "/auth-with-one-time-token", // TODO
   register: "/register",
   login: "/login",
+  authorization: "/authorization",
 
   // User.
   user: "/user",
