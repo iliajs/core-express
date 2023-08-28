@@ -76,16 +76,18 @@ const login = async (request, response) => {
   const { data, password } = request.body;
   const user = await User.findOne({
     where: { [Op.or]: [{ username: data }, { email: data }] },
-    attributes: ["hash"],
+    attributes: ["id", "hash"],
   });
 
-  if (!user || !bcrypt.compareSync(password, user.hash)) {
+  if (!user.id || !bcrypt.compareSync(password, user.hash)) {
     return response
       .status(401)
       .json({ error: "wrong credentials or user not found" });
   }
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_PASSPHRASE);
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_PASSPHRASE, {
+    expiresIn: "7d",
+  });
 
   return response.status(200).json({ jwt: token });
 };
@@ -99,8 +101,8 @@ const authorization = async (request, response) => {
   const { token } = request.body;
 
   try {
-    jwt.verify(token, process.env.JWT_PASSPHRASE);
-    return response.status(200).json({ authorized: true });
+    const res = jwt.verify(token, process.env.JWT_PASSPHRASE);
+    return response.status(200).json({ authorized: true, res });
   } catch (e) {
     return response.status(401).json({ error: "not authorized" });
   }
