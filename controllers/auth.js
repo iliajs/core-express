@@ -83,6 +83,7 @@ const authorization = async (request, response) => {
       return notAuthorized();
     }
   } catch (e) {
+    console.error(e);
     return notAuthorized();
   }
 };
