@@ -20,6 +20,7 @@ export default class SequelizeOperation {
     if (process.env.REMOVE_ALL_DATABASE_DATA !== "true") {
       return;
     }
+
     const options = {
       force: true,
     };

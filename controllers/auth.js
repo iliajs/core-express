@@ -39,13 +39,13 @@ const login = async (request, response) => {
     return response.status(403).json({ errors: validator.array() });
   }
 
-  const { data, password } = request.body;
+  const { user: inputUser, password } = request.body;
   const user = await User.findOne({
-    where: { [Op.or]: [{ username: data }, { email: data }] },
+    where: { [Op.or]: [{ username: inputUser }, { email: inputUser }] },
     attributes: ["id", "hash"],
   });
 
-  if (!user.id || !bcrypt.compareSync(password, user.hash)) {
+  if (!user?.id || !bcrypt.compareSync(password, user.hash)) {
     return response
       .status(401)
       .json({ error: "wrong credentials or user not found" });

@@ -32,7 +32,7 @@ export const router = (app) => {
   app.post(
     routes.login,
     [
-      body("data").isLength({ min: 2, max: 50 }),
+      body("user").isLength({ min: 2, max: 50 }),
       body("password").isStrongPassword({ minSymbols: 0 }),
     ],
     auth.login
