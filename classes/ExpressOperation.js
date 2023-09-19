@@ -3,7 +3,7 @@ import { UI_FILE_PATH } from "../settings/index.js";
 import { routesWithoutAuthorization } from "../settings/routes.js";
 import { serverPort } from "../settings/port.js";
 import { showServerInfo } from "../helpers/logs.js";
-import { router } from "../router/router.js";
+import { router } from "../router.js";
 
 export class ExpressOperation {
   constructor() {

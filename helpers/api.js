@@ -1,4 +1,4 @@
-export const unknownErrorText = (actionName, objectName) => {
+export const generateErrorText = (actionName, objectName) => {
   return `Exception. Cannot ${actionName} ${objectName}.`;
 };
 

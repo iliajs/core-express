@@ -1,5 +1,5 @@
 import { Word } from "../db/models/Word.js";
-import { unknownErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendError } from "../helpers/api.js";
 import { Translation } from "../db/models/Translation.js";
 import { validationResult } from "express-validator";
 
@@ -27,7 +27,7 @@ const list = async (request, response) => {
     response.send({ success: true, data });
   } catch (error) {
     return sendError({
-      errorText: unknownErrorText("list", "translations"),
+      errorText: generateErrorText("list", "translations"),
       error,
       response,
     });
@@ -54,7 +54,7 @@ const create = async (request, response) => {
     response.send({ success: true, data });
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("create", "translation"),
+      errorText: generateErrorText("create", "translation"),
       error,
       response,
     });

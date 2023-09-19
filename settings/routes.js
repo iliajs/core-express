@@ -23,8 +23,9 @@ export const routes = {
   credential: "/credential",
 
   // Word.
-  word: "/word",
+  tag: "/tag",
   translation: "/translation",
+  word: "/word",
 };
 
 export const routesWithoutAuthorization = [

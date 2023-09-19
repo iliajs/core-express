@@ -1,5 +1,5 @@
 import { Word } from "../db/models/Word.js";
-import { unknownErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
 import { Translation } from "../db/models/Translation.js";
@@ -21,7 +21,7 @@ const list = async (request, response) => {
     response.send({ success: true, data });
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("list", "categories"),
+      errorText: generateErrorText("list", "categories"),
       error,
       response,
     });
@@ -35,7 +35,7 @@ const show = async (request, response) => {
     data ? response.send({ success: true, data }) : response.sendStatus(404);
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("show", "word"),
+      errorText: generateErrorText("show", "word"),
       error,
       response,
     });
@@ -53,7 +53,7 @@ const create = async (request, response) => {
       : response.status(409).send({ errorText: lang.duplicateIsFound });
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("create", "word"),
+      errorText: generateErrorText("create", "word"),
       error,
       response,
     });
@@ -84,7 +84,7 @@ const update = async (request, response) => {
     response.send({ success: true });
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("update", "word"),
+      errorText: generateErrorText("update", "word"),
       error,
       response,
     });
@@ -107,7 +107,7 @@ const destroy = async (request, response) => {
     }
   } catch (error) {
     sendError({
-      errorText: unknownErrorText("delete", "word"),
+      errorText: generateErrorText("delete", "word"),
       error,
       response,
     });

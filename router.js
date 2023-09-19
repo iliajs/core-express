@@ -1,12 +1,13 @@
-import auth from "../controllers/auth.js";
-import credential from "../controllers/credential.js";
-import googleDrive from "../controllers/googleDrive.js";
-import system from "../controllers/system.js";
-import translation from "../controllers/translation.js";
-import user from "../controllers/user.js";
-import word from "../controllers/word.js";
+import auth from "./controllers/auth.js";
+import credential from "./controllers/credential.js";
+import googleDrive from "./controllers/googleDrive.js";
+import system from "./controllers/system.js";
+import tag from "./controllers/tag.js";
+import translation from "./controllers/translation.js";
+import user from "./controllers/user.js";
+import word from "./controllers/word.js";
 
-import { routes } from "../settings/routes.js";
+import { routes } from "./settings/routes.js";
 
 import { body, param, query } from "express-validator";
 
@@ -48,6 +49,9 @@ export const router = (app) => {
   // Credentials.
   app.get(routes.credential, body("username").notEmpty(), credential.get);
   app.put(routes.credential, body("data").notEmpty(), credential.update);
+
+  // Tags.
+  app.get(routes.tag, tag.list);
 
   // Words.
   app.get(routes.word, word.list);
