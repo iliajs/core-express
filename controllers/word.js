@@ -3,10 +3,21 @@ import { unknownErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
 import { Translation } from "../db/models/Translation.js";
+import { WordAndTag } from "../db/models/WordAndTag.js";
+import { Tag } from "../db/models/Tag.js";
 
 const list = async (request, response) => {
   try {
     const data = await Word.findAll({ include: Translation });
+    try {
+      // TODO
+      //await Tag.create({ name: "my first tag" });
+      const tag = await Tag.findOne({ where: { name: "my first tag" } });
+      console.log(tag.id);
+      const word = await Word.findOne();
+      await WordAndTag.create({ tagId: tag.id, wordId: word.id });
+      console.log(word.title);
+    } catch (e) {}
     response.send({ success: true, data });
   } catch (error) {
     sendError({

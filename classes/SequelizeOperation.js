@@ -4,7 +4,13 @@ export default class SequelizeOperation {
   instance;
 
   constructor() {
-    this.instance = new Sequelize(process.env.POSTGRES_CONNECTION_STRING);
+    const options = {
+      logging: false,
+    };
+    this.instance = new Sequelize(
+      process.env.POSTGRES_CONNECTION_STRING,
+      options
+    );
   }
 
   async connect() {
@@ -22,7 +28,7 @@ export default class SequelizeOperation {
     }
 
     const options = {
-      force: true,
+      force: false,
     };
 
     await this.instance.sync(options);
