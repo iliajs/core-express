@@ -52,6 +52,7 @@ export const router = (app) => {
 
   // Tags.
   app.get(routes.tag, tag.list);
+  app.post(routes.tag, tag.create);
 
   // Words.
   app.get(routes.word, word.list);
