@@ -51,8 +51,9 @@ export const router = (app) => {
   app.put(routes.credential, body("data").notEmpty(), credential.update);
 
   // Tags.
-  app.get(routes.tag, tag.list);
   app.post(routes.tag, tag.create);
+  app.delete(`${routes.tag}/:id`, tag.destroy);
+  app.get(routes.tag, tag.list);
 
   // Words.
   app.get(routes.word, word.list);
