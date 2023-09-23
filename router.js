@@ -20,11 +20,11 @@ export const router = (app) => {
   app.post(
     routes.register,
     [
-      body("username").notEmpty(), // TODO add trim here and for 4 lines below
-      body("email").isEmail(),
-      body("firstName").notEmpty(),
-      body("lastName").notEmpty(),
-      body("password").notEmpty(),
+      body("username").notEmpty().trim(),
+      body("email").isEmail().trim(),
+      body("firstName").notEmpty().trim(),
+      body("lastName").notEmpty().trim(),
+      body("password").notEmpty().trim(),
     ],
     auth.register
   );
@@ -44,7 +44,7 @@ export const router = (app) => {
 
   // Users.
   app.get(routes.user, user.list);
-  app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show);
+  //app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show); // TODO Is it active?
 
   // Credentials.
   app.get(routes.credential, body("username").notEmpty(), credential.get);
@@ -52,26 +52,35 @@ export const router = (app) => {
 
   // Tags.
   app.post(routes.tag, tag.create);
-  app.delete(`${routes.tag}/:id`, tag.destroy);
+  app.delete(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.destroy);
   app.get(routes.tag, tag.list);
 
   // Words.
   app.get(routes.word, word.list);
-  app.get(`${routes.word}/:id`, word.show);
+  app.get(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.show);
   app.post(routes.word, word.create);
-  app.post(`${routes.word}/:id`, word.update);
-  app.delete(`${routes.word}/:id`, word.destroy);
+  app.post(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.update);
+  app.post(
+    `${routes.word}/:wordId/updateTags`,
+    param("wordId").notEmpty().isUUID(),
+    word.updateTags
+  );
+  app.delete(
+    `${routes.word}/:id`,
+    param("id").notEmpty().isUUID(),
+    word.destroy
+  );
 
   // Translations.
   app.get(
     routes.translation,
-    query("wordId").notEmpty().isNumeric(),
+    query("wordId").notEmpty().isUUID(),
     translation.list
   );
 
   app.post(
     routes.translation,
-    query("wordId").notEmpty().isNumeric(),
+    query("wordId").notEmpty().isUUID(),
     translation.create
   );
 };

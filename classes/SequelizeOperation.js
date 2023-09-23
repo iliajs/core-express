@@ -23,13 +23,15 @@ export default class SequelizeOperation {
   }
 
   async updateDatabaseStructure() {
-    if (process.env.REMOVE_ALL_DATABASE_DATA !== "true") {
+    if (process.env.UPDATE_DATABASE_STRUCTURE !== "true") {
       return;
     }
 
-    const options = {
-      force: false,
-    };
+    const options = {};
+
+    if (process.env.REMOVE_ALL_DATABASE_DATA === "true") {
+      options.force = true;
+    }
 
     await this.instance.sync(options);
   }
