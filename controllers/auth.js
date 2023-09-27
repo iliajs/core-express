@@ -4,6 +4,7 @@ import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 import { User } from "../db/models/User.js";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
+import { prisma } from "../app.js";
 
 const register = async (request, response) => {
   const validator = validationResult(request);
@@ -40,10 +41,14 @@ const login = async (request, response) => {
   }
 
   const { user: inputUser, password } = request.body;
-  const user = await User.findOne({
-    where: { [Op.or]: [{ username: inputUser }, { email: inputUser }] },
-    attributes: ["id", "hash"],
+
+  const user = await prisma.users.findFirst({
+    where: {
+      OR: [{ username: inputUser }, { email: inputUser }],
+    },
   });
+
+  console.log(user.id);
 
   if (!user?.id || !bcrypt.compareSync(password, user.hash)) {
     return response

@@ -2,13 +2,19 @@ import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import { User } from "../db/models/User.js";
 import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
+import { prisma } from "../app.js";
 
 const list = async (request, response) => {
-  const users = await User.findAll();
-  return response.status(200).json({ success: true, data: users });
+  const data = (await prisma.users.findMany()).map((item) => {
+    delete item.hash;
+    return item;
+  });
+
+  return response.status(200).json({ success: true, data });
 };
 
 const show = async (request, response) => {
+  // TODO Move to prisma
   const { id } = request.params;
   const user = await User.findByPk(id);
   return response.status(200).json(user);
