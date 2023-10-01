@@ -1,10 +1,10 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
-import { User } from "../db/models/User.js";
-import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import { prisma } from "../app.js";
+import chalk from "chalk";
+import { generateErrorText, sendError } from "../helpers/api.js";
 
 const register = async (request, response) => {
   const validator = validationResult(request);
@@ -16,21 +16,32 @@ const register = async (request, response) => {
   const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
   const hash = bcrypt.hashSync(password, salt);
 
-  const [, created] = await User.findOrCreate({
-    where: { [Op.or]: [{ username }, { email }] },
-    defaults: {
-      firstName,
-      lastName,
-      hash,
-      username,
-      email,
-    },
+  const user = await prisma.users.findFirst({
+    where: { OR: [{ username }, { email }] },
   });
 
-  if (created) {
+  try {
+    if (user) {
+      return response.status(409).json({ error: "already exists" });
+    }
+
+    await prisma.users.create({
+      data: {
+        firstName,
+        lastName,
+        hash,
+        username,
+        email,
+      },
+    });
+
     response.status(200).json({ created: true });
-  } else {
-    response.status(409).json({ error: "already exists" });
+  } catch (error) {
+    sendError({
+      errorText: generateErrorText("create", "user"),
+      error,
+      response,
+    });
   }
 };
 
@@ -47,8 +58,6 @@ const login = async (request, response) => {
       OR: [{ username: inputUser }, { email: inputUser }],
     },
   });
-
-  console.log(user.id);
 
   if (!user?.id || !bcrypt.compareSync(password, user.hash)) {
     return response
@@ -78,7 +87,7 @@ const authorization = async (request, response) => {
   try {
     const { userId } = jwt.verify(token, process.env.JWT_PASSPHRASE);
 
-    const user = await User.findOne({
+    const user = await prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -88,7 +97,7 @@ const authorization = async (request, response) => {
       return notAuthorized();
     }
   } catch (e) {
-    console.error(e);
+    console.error(chalk.redBright("jwt is failed"));
     return notAuthorized();
   }
 };

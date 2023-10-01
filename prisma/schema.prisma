@@ -16,7 +16,7 @@ model credentials {
 }
 
 model tags {
-  id           String         @id @db.Uuid
+  id           String         @id @default(uuid()) @db.Uuid
   name         String         @unique @db.VarChar(255)
   createdAt    DateTime       @db.Timestamptz(6)
   updatedAt    DateTime       @db.Timestamptz(6)
@@ -24,7 +24,7 @@ model tags {
 }
 
 model translations {
-  id        String   @id @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   text      String   @db.Char(1000)
   createdAt DateTime @db.Timestamptz(6)
   updatedAt DateTime @db.Timestamptz(6)
@@ -33,18 +33,18 @@ model translations {
 }
 
 model users {
-  id        String   @id @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   username  String   @unique @db.VarChar(255)
-  email     String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
   firstName String   @db.VarChar(255)
   lastName  String   @db.VarChar(255)
   hash      String   @db.VarChar(60)
-  createdAt DateTime @db.Timestamptz(6)
-  updatedAt DateTime @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model words {
-  id           String         @id @db.Uuid
+  id           String         @id @default(uuid()) @db.Uuid
   title        String         @unique @db.VarChar(255)
   createdAt    DateTime       @db.Timestamptz(6)
   updatedAt    DateTime       @db.Timestamptz(6)
