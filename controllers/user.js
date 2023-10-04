@@ -5,7 +5,7 @@ import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 import { prisma } from "../app.js";
 
 const list = async (request, response) => {
-  const data = (await prisma.users.findMany()).map((item) => {
+  const data = (await prisma.user.findMany()).map((item) => {
     delete item.hash;
     return item;
   });

@@ -16,7 +16,7 @@ const register = async (request, response) => {
   const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
   const hash = bcrypt.hashSync(password, salt);
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.user.findFirst({
     where: { OR: [{ username }, { email }] },
   });
 
@@ -25,7 +25,7 @@ const register = async (request, response) => {
       return response.status(409).json({ error: "already exists" });
     }
 
-    await prisma.users.create({
+    await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -53,7 +53,7 @@ const login = async (request, response) => {
 
   const { user: inputUser, password } = request.body;
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       OR: [{ username: inputUser }, { email: inputUser }],
     },
@@ -87,7 +87,7 @@ const authorization = async (request, response) => {
   try {
     const { userId } = jwt.verify(token, process.env.JWT_PASSPHRASE);
 
-    const user = await prisma.users.findFirst({
+    const user = await prisma.user.findFirst({
       where: { id: userId },
     });
 
