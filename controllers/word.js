@@ -2,19 +2,26 @@ import { Word } from "../db/models/Word.js";
 import { generateErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
-import { Translation } from "../db/models/Translation.js";
 import { WordAndTag } from "../db/models/WordAndTag.js";
-import { Tag } from "../db/models/Tag.js";
+import { prisma } from "../app.js";
 
 const create = async (request, response) => {
   try {
     const { title } = request.body;
-    const [data, isCreated] = await Word.findOrCreate({
-      where: { title },
+    const exist = await prisma.words.findFirst({ where: { title } });
+    console.log(exist);
+
+    if (exist) {
+      return await response
+        .status(409)
+        .send({ errorText: lang.duplicateIsFound });
+    }
+
+    const word = await prisma.words.create({
+      data: { title },
     });
-    isCreated
-      ? response.send({ success: true, data })
-      : response.status(409).send({ errorText: lang.duplicateIsFound });
+
+    response.send({ success: true, word });
   } catch (error) {
     sendError({
       errorText: generateErrorText("create", "word"),
@@ -27,9 +34,9 @@ const create = async (request, response) => {
 const destroy = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await Word.findByPk(id);
+    const data = await prisma.words.findFirst({ where: { id } });
     if (data) {
-      await Word.destroy({
+      await prisma.words.delete({
         where: {
           id,
         },
@@ -49,7 +56,9 @@ const destroy = async (request, response) => {
 
 const list = async (request, response) => {
   try {
-    const data = await Word.findAll({ include: [Translation, Tag] });
+    const data = await prisma.words.findMany({
+      include: { translations: true, wordsAndTags: true },
+    });
     response.send({ success: true, data });
   } catch (error) {
     sendError({

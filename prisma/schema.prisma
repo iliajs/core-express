@@ -8,57 +8,57 @@ datasource db {
 }
 
 model credentials {
-  id        Int      @id @default(autoincrement())
-  type      String   @db.VarChar(255)
+  id        Int       @id @default(autoincrement())
+  type      String    @db.VarChar(255)
   data      Bytes
-  createdAt DateTime @db.Timestamptz(6)
-  updatedAt DateTime @db.Timestamptz(6)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
 }
 
 model tags {
   id           String         @id @default(uuid()) @db.Uuid
   name         String         @unique @db.VarChar(255)
   createdAt    DateTime       @db.Timestamptz(6)
-  updatedAt    DateTime       @db.Timestamptz(6)
+  updatedAt    DateTime?      @db.Timestamptz(6)
   wordsAndTags wordsAndTags[]
 }
 
 model translations {
-  id        String   @id @default(uuid()) @db.Uuid
-  text      String   @db.Char(1000)
-  createdAt DateTime @db.Timestamptz(6)
-  updatedAt DateTime @db.Timestamptz(6)
-  wordId    String   @db.Uuid
-  words     words    @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid()) @db.Uuid
+  text      String    @db.Char(1000)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
+  wordId    String    @db.Uuid
+  words     words     @relation(fields: [wordId], references: [id], onDelete: Cascade)
 }
 
 model users {
-  id        String   @id @default(uuid()) @db.Uuid
-  username  String   @unique @db.VarChar(255)
-  email     String   @unique @db.VarChar(255)
-  firstName String   @db.VarChar(255)
-  lastName  String   @db.VarChar(255)
-  hash      String   @db.VarChar(60)
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  id        String    @id @default(uuid()) @db.Uuid
+  username  String    @unique @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  firstName String    @db.VarChar(255)
+  lastName  String    @db.VarChar(255)
+  hash      String    @db.VarChar(60)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
 }
 
 model words {
   id           String         @id @default(uuid()) @db.Uuid
   title        String         @unique @db.VarChar(255)
-  createdAt    DateTime       @db.Timestamptz(6)
-  updatedAt    DateTime       @db.Timestamptz(6)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime?      @db.Timestamptz(6)
   translations translations[]
   wordsAndTags wordsAndTags[]
 }
 
 model wordsAndTags {
-  wordId    String   @db.Uuid
-  tagId     String   @db.Uuid
-  createdAt DateTime @db.Timestamptz(6)
-  updatedAt DateTime @db.Timestamptz(6)
-  tags      tags     @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  words     words    @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  wordId    String    @db.Uuid
+  tagId     String    @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
+  tags      tags      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  words     words     @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
   @@id([wordId, tagId])
 }

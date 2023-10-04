@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "words" ALTER COLUMN "updatedAt" DROP NOT NULL,
+ALTER COLUMN "updatedAt" DROP DEFAULT;
