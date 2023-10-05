@@ -3,22 +3,22 @@ import { generateErrorText, sendError } from "../helpers/api.js";
 import { Op } from "sequelize";
 import lang from "../lang.js";
 import { WordAndTag } from "../db/models/WordAndTag.js";
-import { prisma } from "../app.js";
+import { auth, prisma } from "../app.js";
 
 const create = async (request, response) => {
   try {
     const { title } = request.body;
-    const exist = await prisma.words.findFirst({ where: { title } });
-    console.log(exist);
 
-    if (exist) {
-      return await response
-        .status(409)
-        .send({ errorText: lang.duplicateIsFound });
+    const existentWord = await prisma.word.findFirst({
+      where: { title, userId: auth.user.id },
+    });
+
+    if (existentWord) {
+      return await response.status(409).send(lang.duplicateIsFound);
     }
 
-    const word = await prisma.words.create({
-      data: { title },
+    const word = await prisma.word.create({
+      data: { title, userId: auth.user.id },
     });
 
     response.send({ success: true, word });
@@ -34,54 +34,50 @@ const create = async (request, response) => {
 const destroy = async (request, response) => {
   try {
     const { id } = request.params;
-    const data = await prisma.words.findFirst({ where: { id } });
+
+    const data = await prisma.word.findFirst({
+      where: { id, userId: auth.user.id },
+    });
+
     if (data) {
-      await prisma.words.delete({
+      await prisma.word.delete({
         where: {
           id,
+          userId: auth.user.id,
         },
       });
-      response.send({ success: true });
+      response.send(lang.deleted);
     } else {
       response.sendStatus(404);
     }
   } catch (error) {
-    sendError({
-      errorText: generateErrorText("delete", "word"),
-      error,
-      response,
-    });
+    response.sendStatus(500);
   }
 };
 
 const list = async (request, response) => {
   try {
-    const data = await prisma.words.findMany({
-      include: { translations: true, wordsAndTags: true },
+    const data = await prisma.word.findMany({
+      where: { userId: auth.user.id },
+      include: { translations: true, tags: true },
     });
-    response.send({ success: true, data });
+    response.json(data);
   } catch (error) {
-    sendError({
-      errorText: generateErrorText("list", "categories"),
-      error,
-      response,
-    });
+    response.sendStatus(500);
   }
 };
 
 const show = async (request, response) => {
   try {
     const { id } = request.params;
-    console.log("id", id);
-    const data = await Word.findByPk(`${id}`);
-    console.log(data);
-    data ? response.send({ success: true, data }) : response.sendStatus(404);
-  } catch (error) {
-    sendError({
-      errorText: generateErrorText("show", "word"),
-      error,
-      response,
+
+    const data = await prisma.word.findFirst({
+      where: { id, userId: auth.user.id },
     });
+
+    data ? response.json(data) : response.sendStatus(404);
+  } catch (error) {
+    response.sendStatus(500);
   }
 };
 
@@ -102,7 +98,7 @@ const update = async (request, response) => {
         },
       })
     ) {
-      return response.status(409).send({ errorText: lang.duplicateIsFound });
+      return response.sendStatus(409);
     }
 
     await Word.update({ title }, { where: { id } });

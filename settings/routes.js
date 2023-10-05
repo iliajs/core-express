@@ -29,8 +29,9 @@ export const routes = {
 };
 
 export const routesWithoutAuthorization = [
-  routes.root,
+  routes.auth_with_one_time_token, // TODO
   routes.favicon,
-  routes.auth_with_one_time_token,
+  routes.login,
+  routes.root, // TODO
   routes.telegram_webhook,
 ];

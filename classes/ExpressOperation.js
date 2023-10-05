@@ -4,6 +4,7 @@ import { routesWithoutAuthorization } from "../settings/routes.js";
 import { serverPort } from "../settings/port.js";
 import { showServerInfo } from "../helpers/logs.js";
 import { router } from "../router.js";
+import { auth } from "../app.js";
 
 export class ExpressOperation {
   constructor() {
@@ -15,7 +16,7 @@ export class ExpressOperation {
 
     app.use(async function (request, response, next) {
       // Because Chrome doesn't support CORS for connections from localhost we need this for local development.
-      // TODO Check that in heroku config it's false.
+      // TODO Check that in production it's false.
       if (process.env.ALLOW_ORIGIN_ALL === "true") {
         response.header("Access-Control-Allow-Origin", "*");
         response.header(
@@ -32,30 +33,19 @@ export class ExpressOperation {
         return next();
       }
 
-      if (!routesWithoutAuthorization.includes(request.url)) {
-        // TODO Send 403? status when token is not presented or incorrect
-        // if (!request.headers['authorization']) {
-        //   // TODO Enable authorization check for production.
-        //   // TODO Not it's disabled. To enable uncomment next line and remove 'return next()' line after next one.
-        //   // console.error('Auth error #1: try to access private route without access token.')
-        //   // console.log("Requested url: ", request.url)
-        //   // response.status(403).json({error: 'token_not_presented'});
-        //   console.log('no1')
-        //   return next()
-        // }
+      if (routesWithoutAuthorization.includes(request.url)) {
         return next();
-        // TODO Enable authorization check for production.
-        // TODO Not it's disabled. To enable uncomment next line and remove 'return next()' line after next one.
-
-        // const authToken = request.headers['authorization']?.split(" ")[1];
-        // const modelUser = new UserModel();
-        // const find = await modelUser.findByToken(authToken)
-        // if (!find) {
-        //   response.status(403).json({error: 'token_invalid'});
-        // } else {
-        //   return next();
-        // }
       } else {
+        const user = await auth.getUserByAuthorizationHeader(
+          request.headers["authorization"]
+        );
+
+        auth.setUser(user);
+
+        if (!user) {
+          return response.status(403).send("Unauthorized");
+        }
+
         return next();
       }
     });

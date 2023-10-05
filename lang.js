@@ -1,3 +1,5 @@
 export default {
-  duplicateIsFound: "Duplicate is found;",
+  deleted: "Deleted",
+  duplicateIsFound: "Duplicate",
+  internalServerError: "Internal server error",
 };
