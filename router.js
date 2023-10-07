@@ -51,11 +51,29 @@ export const router = (app) => {
   app.put(routes.credential, body("data").notEmpty(), credential.update);
 
   // Tags.
-  app.post(routes.tag, tag.create);
   app.delete(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.destroy);
   app.get(routes.tag, tag.list);
+  app.get(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.show);
+  app.post(routes.tag, tag.create);
+
+  // Translations.
+  app.get(
+    routes.translation,
+    query("wordId").notEmpty().isUUID(),
+    translation.list
+  );
+  app.post(
+    routes.translation,
+    query("wordId").notEmpty().isUUID(),
+    translation.create
+  );
 
   // Words.
+  app.delete(
+    `${routes.word}/:id`,
+    param("id").notEmpty().isUUID(),
+    word.destroy
+  );
   app.get(routes.word, word.list);
   app.get(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.show);
   app.post(routes.word, word.create);
@@ -64,23 +82,5 @@ export const router = (app) => {
     `${routes.word}/:wordId/updateTags`,
     param("wordId").notEmpty().isUUID(),
     word.updateTags
-  );
-  app.delete(
-    `${routes.word}/:id`,
-    param("id").notEmpty().isUUID(),
-    word.destroy
-  );
-
-  // Translations.
-  app.get(
-    routes.translation,
-    query("wordId").notEmpty().isUUID(),
-    translation.list
-  );
-
-  app.post(
-    routes.translation,
-    query("wordId").notEmpty().isUUID(),
-    translation.create
   );
 };

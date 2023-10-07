@@ -15,6 +15,7 @@ export class ExpressOperation {
     app.use(express.urlencoded()); // To support URL-encoded bodies.
 
     app.use(async function (request, response, next) {
+      console.log("AA");
       // Because Chrome doesn't support CORS for connections from localhost we need this for local development.
       // TODO Check that in production it's false.
       if (process.env.ALLOW_ORIGIN_ALL === "true") {

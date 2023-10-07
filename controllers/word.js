@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import lang from "../lang.js";
 import { WordAndTag } from "../db/models/WordAndTag.js";
 import { auth, prisma } from "../app.js";
+import { validationResult } from "express-validator";
 
 const create = async (request, response) => {
   try {
@@ -14,7 +15,7 @@ const create = async (request, response) => {
     });
 
     if (existentWord) {
-      return await response.status(409).send(lang.duplicateIsFound);
+      return await response.sendStatus(409);
     }
 
     const word = await prisma.word.create({
@@ -68,14 +69,24 @@ const list = async (request, response) => {
 };
 
 const show = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   try {
     const { id } = request.params;
 
     const data = await prisma.word.findFirst({
       where: { id, userId: auth.user.id },
+      include: { tags: true },
     });
 
-    data ? response.json(data) : response.sendStatus(404);
+    if (!data) {
+      return response.sendStatus(404);
+    }
+
+    response.json(data);
   } catch (error) {
     response.sendStatus(500);
   }

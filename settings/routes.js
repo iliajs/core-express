@@ -32,6 +32,7 @@ export const routesWithoutAuthorization = [
   routes.auth_with_one_time_token, // TODO
   routes.favicon,
   routes.login,
+  routes.register,
   routes.root, // TODO
   routes.telegram_webhook,
 ];
