@@ -15,11 +15,11 @@ const create = async (request, response) => {
       return await response.sendStatus(409);
     }
 
-    const tag = await prisma.tag.create({
+    const data = await prisma.tag.create({
       data: { name, userId: auth.user.id },
     });
 
-    return response.send({ success: true, tag });
+    return response.send({ success: true, data });
   } catch (error) {
     sendError({
       errorText: generateErrorText("create", "tag"),

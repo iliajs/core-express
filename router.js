@@ -77,7 +77,7 @@ export const router = (app) => {
   app.get(routes.word, word.list);
   app.get(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.show);
   app.post(routes.word, word.create);
-  app.post(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.update);
+  app.put(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.update);
   app.post(
     `${routes.word}/:wordId/updateTags`,
     param("wordId").notEmpty().isUUID(),

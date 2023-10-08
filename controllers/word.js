@@ -1,12 +1,15 @@
-import { Word } from "../db/models/Word.js";
 import { generateErrorText, sendError } from "../helpers/api.js";
-import { Op } from "sequelize";
 import lang from "../lang.js";
 import { WordAndTag } from "../db/models/WordAndTag.js";
 import { auth, prisma } from "../app.js";
 import { validationResult } from "express-validator";
 
 const create = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   try {
     const { title } = request.body;
 
@@ -18,11 +21,11 @@ const create = async (request, response) => {
       return await response.sendStatus(409);
     }
 
-    const word = await prisma.word.create({
+    const data = await prisma.word.create({
       data: { title, userId: auth.user.id },
     });
 
-    response.send({ success: true, word });
+    response.send({ success: true, data });
   } catch (error) {
     sendError({
       errorText: generateErrorText("create", "word"),
@@ -33,6 +36,11 @@ const create = async (request, response) => {
 };
 
 const destroy = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   try {
     const { id } = request.params;
 
@@ -57,6 +65,11 @@ const destroy = async (request, response) => {
 };
 
 const list = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   try {
     const data = await prisma.word.findMany({
       where: { userId: auth.user.id },
@@ -93,26 +106,39 @@ const show = async (request, response) => {
 };
 
 const update = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   try {
     const { id } = request.params;
     const { title } = request.body;
 
-    if (!(await Word.findByPk(id))) {
+    if (
+      !(await prisma.word.findFirst({
+        where: { id, userId: auth.user.id },
+      }))
+    ) {
       return response.sendStatus(404);
     }
 
     if (
-      await Word.findOne({
+      await prisma.word.findFirst({
         where: {
           title,
-          id: { [Op.ne]: id },
+          NOT: { id },
         },
       })
     ) {
       return response.sendStatus(409);
     }
 
-    await Word.update({ title }, { where: { id } });
+    await prisma.word.update({
+      where: { id, userId: auth.user.id },
+      data: { title },
+    });
+
     response.send({ success: true });
   } catch (error) {
     sendError({
@@ -124,6 +150,11 @@ const update = async (request, response) => {
 };
 
 const updateTags = async (request, response) => {
+  const validator = validationResult(request);
+  if (!validator.isEmpty()) {
+    return response.send({ errors: validator.array() });
+  }
+
   const { wordId } = request.params;
   const { tags } = request.body;
 
@@ -144,4 +175,4 @@ const updateTags = async (request, response) => {
   }
 };
 
-export default { destroy, create, list, show, update, updateTags };
+export default { create, destroy, list, show, update, updateTags };
