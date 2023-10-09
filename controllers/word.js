@@ -1,6 +1,5 @@
 import { generateErrorText, sendError } from "../helpers/api.js";
 import lang from "../lang.js";
-import { WordAndTag } from "../db/models/WordAndTag.js";
 import { auth, prisma } from "../app.js";
 import { validationResult } from "express-validator";
 
@@ -159,14 +158,44 @@ const updateTags = async (request, response) => {
   const { tags } = request.body;
 
   try {
-    await WordAndTag.destroy({ where: { wordId } });
+    if (
+      !(await prisma.word.findFirst({
+        where: { id: wordId, userId: auth.user.id },
+      }))
+    ) {
+      return response.sendStatus(404);
+    }
 
-    tags.forEach((tagId) => {
-      WordAndTag.create({ tagId, wordId });
+    // TODO add connections for all tags and also need to delete old connections
+    // tags.forEach((tagId) => {
+    //   // tagId
+    // }
+
+    const data = [];
+
+    await prisma.tagsOnWords.create({
+      data: {
+        word: {
+          connect: { id: wordId },
+        },
+
+        tag: {
+          connect: { id: tags[0] },
+        },
+
+        user: {
+          connect: { id: auth.user.id },
+        },
+      },
+      include: { word: true, tag: true },
     });
 
-    response.status(200).send({ updated: true });
+    response.status(200).send({ updated: true, data });
   } catch (error) {
+    if (error.code === "P2025") {
+      return response.sendStatus(404);
+    }
+
     sendError({
       errorText: generateErrorText("updateTags", "word"),
       error,
