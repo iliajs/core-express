@@ -166,34 +166,35 @@ const updateTags = async (request, response) => {
       return response.sendStatus(404);
     }
 
-    // TODO add connections for all tags and also need to delete old connections
-    // tags.forEach((tagId) => {
-    //   // tagId
-    // }
+    // TODO: If tagId not exists, then we delete all connections but cannot add anyone; It's a mistake;
+    await prisma.tagsOnWords.deleteMany({ where: { wordId } });
 
-    const data = [];
+    for (const tagId of tags) {
+      await prisma.tagsOnWords.create({
+        data: {
+          word: {
+            connect: { id: wordId },
+          },
 
-    await prisma.tagsOnWords.create({
-      data: {
-        word: {
-          connect: { id: wordId },
+          tag: {
+            connect: { id: tagId },
+          },
+
+          user: {
+            connect: { id: auth.user.id },
+          },
         },
+        include: { word: true, tag: true },
+      });
+    }
 
-        tag: {
-          connect: { id: tags[0] },
-        },
-
-        user: {
-          connect: { id: auth.user.id },
-        },
-      },
-      include: { word: true, tag: true },
-    });
-
-    response.status(200).send({ updated: true, data });
+    response.status(200).send({ updated: true });
   } catch (error) {
-    if (error.code === "P2025") {
-      return response.sendStatus(404);
+    switch (error.code) {
+      case "P2002":
+        return response.sendStatus(409);
+      case "P2025":
+        return response.sendStatus(404);
     }
 
     sendError({
