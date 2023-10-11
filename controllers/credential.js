@@ -1,4 +1,3 @@
-import { Credential } from "../db/models/Credential.js";
 import { credentialRecordTypes } from "../settings/index.js";
 import { validationResult } from "express-validator";
 import { Op } from "sequelize";

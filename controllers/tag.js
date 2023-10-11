@@ -57,7 +57,7 @@ const list = async (request, response) => {
   try {
     const data = await prisma.tag.findMany({
       where: { userId: auth.user.id },
-      //include: { words: true },
+      include: { words: true },
     });
 
     response.json(data);

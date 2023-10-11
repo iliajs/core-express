@@ -1,51 +1,41 @@
-import { validationResult } from "express-validator";
-import bcrypt from "bcryptjs";
-import { User } from "../db/models/User.js";
-import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 import { prisma } from "../app.js";
+import { generateErrorText, sendError } from "../helpers/api.js";
 
 const list = async (request, response) => {
-  const data = (await prisma.user.findMany()).map((item) => {
-    delete item.hash;
-    return item;
-  });
+  try {
+    const data = (await prisma.user.findMany()).map((item) => {
+      delete item.hash;
+      return item;
+    });
 
-  return response.status(200).json({ success: true, data });
+    return response.status(200).json({ success: true, data });
+  } catch (error) {
+    sendError({
+      errorText: generateErrorText("list", "user"),
+      error,
+      response,
+    });
+  }
 };
 
 const show = async (request, response) => {
-  // TODO Move to prisma
-  const { id } = request.params;
-  const user = await User.findByPk(id);
-  return response.status(200).json(user);
-};
+  try {
+    const { id } = request.params;
 
-const create = async (request, response) => {
-  const validator = validationResult(request);
+    const user = await prisma.user.findFirst({ where: { id } });
 
-  if (!validator.isEmpty()) {
-    return response.status(403).json({ errors: validator.array() });
+    if (!user) {
+      return response.sendStatus(404);
+    }
+
+    return response.status(200).json(user);
+  } catch (error) {
+    sendError({
+      errorText: generateErrorText("show", "user"),
+      error,
+      response,
+    });
   }
-
-  const { username, email, firstName, lastName, password } = request.body;
-  const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
-  const hash = bcrypt.hashSync(password, salt);
-
-  const [user, created] = await User.findOrCreate({
-    where: { username },
-    defaults: {
-      email,
-      firstName,
-      lastName,
-      hash,
-    },
-  });
-
-  response.status(200).json({
-    created,
-    exists: !created,
-    data: user,
-  });
 };
 
-export default { list, show, create };
+export default { list, show };

@@ -1,27 +1,27 @@
-import { Word } from "../db/models/Word.js";
 import { generateErrorText, sendError } from "../helpers/api.js";
-import { Translation } from "../db/models/Translation.js";
 import { validationResult } from "express-validator";
+import { auth, prisma } from "../app.js";
 
 const list = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
-  const wordId = request.query.wordId;
-
-  if (!(await Word.findByPk(wordId))) {
-    return response
-      .status(404)
-      .send({ error: `Cannot find word with id=${wordId}` });
-  }
-
   try {
-    const data = await Translation.findAll({
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
+    const { wordId } = request.query;
+
+    const word = await prisma.word.findFirst({ where: { id: wordId } });
+
+    if (!word) {
+      return response.sendStatus(404);
+    }
+
+    const data = await prisma.translation.findMany({
       where: {
         wordId: wordId,
       },
+      include: { word: true },
     });
 
     response.send({ success: true, data });
@@ -35,22 +35,24 @@ const list = async (request, response) => {
 };
 
 const create = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
-  const wordId = request.query.wordId;
-
-  if (!(await Word.findByPk(wordId))) {
-    return response
-      .status(404)
-      .send({ error: `Cannot find word with id=${wordId}` });
-  }
-
   try {
-    const text = request.body?.text.trim();
-    const data = await Translation.create({ text, wordId });
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
+    const { wordId } = request.query;
+    let { text } = request.body;
+
+    const word = await prisma.word.findFirst({ where: { id: wordId } });
+    if (!word) {
+      return response.sendStatus(404);
+    }
+
+    const data = await prisma.translation.create({
+      data: { text, wordId, userId: auth.user.id },
+    });
+
     response.send({ success: true, data });
   } catch (error) {
     sendError({

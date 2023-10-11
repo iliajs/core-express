@@ -44,7 +44,7 @@ export const router = (app) => {
 
   // Users.
   app.get(routes.user, user.list);
-  //app.get(`${routes.user}/:id`, [param("id").exists().toInt()], user.show); // TODO Is it active?
+  app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it active?
 
   // Credentials.
   app.get(routes.credential, body("username").notEmpty(), credential.get);
