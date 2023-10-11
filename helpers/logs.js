@@ -1,4 +1,3 @@
-import pool from "../db/pool.js";
 import { LANG } from "../settings/lang.js";
 import { serverPort } from "../settings/port.js";
 
