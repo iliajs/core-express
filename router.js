@@ -39,9 +39,6 @@ export const router = (app) => {
     auth.login
   );
 
-  // Authorization.
-  app.post(routes.authorization, [body("token").isJWT()], auth.authorization);
-
   // Users.
   app.get(routes.user, user.list);
   app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it active?

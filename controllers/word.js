@@ -4,12 +4,12 @@ import { auth, prisma } from "../app.js";
 import { validationResult } from "express-validator";
 
 const create = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const { title } = request.body;
 
     const existentWord = await prisma.word.findFirst({
@@ -35,12 +35,12 @@ const create = async (request, response) => {
 };
 
 const destroy = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const { id } = request.params;
 
     const data = await prisma.word.findFirst({
@@ -64,16 +64,17 @@ const destroy = async (request, response) => {
 };
 
 const list = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const data = await prisma.word.findMany({
       where: { userId: auth.user.id },
       include: { translations: true, tags: true },
     });
+
     response.json(data);
   } catch (error) {
     response.sendStatus(500);
@@ -81,12 +82,12 @@ const list = async (request, response) => {
 };
 
 const show = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const { id } = request.params;
 
     const data = await prisma.word.findFirst({
@@ -105,12 +106,12 @@ const show = async (request, response) => {
 };
 
 const update = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const { id } = request.params;
     const { title } = request.body;
 
@@ -149,20 +150,20 @@ const update = async (request, response) => {
 };
 
 const updateTags = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
-  const { wordId } = request.params;
-  const { tags } = request.body;
-
   try {
-    if (
-      !(await prisma.word.findFirst({
-        where: { id: wordId, userId: auth.user.id },
-      }))
-    ) {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
+    const { wordId } = request.params;
+    const { tags } = request.body;
+
+    const foundWord = await prisma.word.findFirst({
+      where: { id: wordId, userId: auth.user.id },
+    });
+
+    if (!foundWord) {
       return response.sendStatus(404);
     }
 

@@ -67,12 +67,12 @@ const list = async (request, response) => {
 };
 
 const show = async (request, response) => {
-  const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.send({ errors: validator.array() });
-  }
-
   try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.send({ errors: validator.array() });
+    }
+
     const { id } = request.params;
 
     const data = await prisma.tag.findFirst({
