@@ -33,6 +33,8 @@ export class ExpressOperation {
         return next();
       }
 
+      console.log("B1");
+
       if (routesWithoutAuthorization.includes(request.url)) {
         return next();
       } else {
@@ -42,8 +44,10 @@ export class ExpressOperation {
 
         auth.setUser(user);
 
+        console.log("B2");
+
         if (!user) {
-          return response.status(403).send("Unauthorized");
+          return response.sendStatus(401);
         }
 
         return next();
