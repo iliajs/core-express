@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 import jwt from "jsonwebtoken";
 import { prisma } from "../app.js";
-import { generateErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 
 const login = async (request, response) => {
   try {
@@ -32,7 +32,7 @@ const login = async (request, response) => {
 
     return response.status(200).json({ jwt: token, user });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("login", "auth"),
       error,
       response,
@@ -71,7 +71,7 @@ const register = async (request, response) => {
 
     response.status(200).json({ created: true });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("create", "user"),
       error,
       response,

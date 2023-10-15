@@ -1,4 +1,4 @@
-import { generateErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import { auth, prisma } from "../app.js";
 import lang from "../lang.js";
 import { validationResult } from "express-validator";
@@ -21,7 +21,7 @@ const create = async (request, response) => {
 
     return response.send({ success: true, data });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("create", "tag"),
       error,
       response,

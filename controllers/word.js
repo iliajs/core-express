@@ -1,4 +1,4 @@
-import { generateErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import lang from "../lang.js";
 import { auth, prisma } from "../app.js";
 import { validationResult } from "express-validator";
@@ -26,7 +26,7 @@ const create = async (request, response) => {
 
     response.send({ success: true, data });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("create", "word"),
       error,
       response,
@@ -59,7 +59,11 @@ const destroy = async (request, response) => {
       response.sendStatus(404);
     }
   } catch (error) {
-    response.sendStatus(500);
+    sendHttp500({
+      errorText: generateErrorText("destroy", "word"),
+      error,
+      response,
+    });
   }
 };
 
@@ -72,12 +76,18 @@ const list = async (request, response) => {
 
     const data = await prisma.word.findMany({
       where: { userId: auth.user.id },
-      include: { translations: true, tags: true },
+      include: { translations: true, tags: { include: { tag: true } } },
     });
 
-    response.json(data);
+    response.json(
+      data.map((item) => ({ ...item, tags: item.tags.map((el) => el.tag) }))
+    );
   } catch (error) {
-    response.sendStatus(500);
+    sendHttp500({
+      errorText: generateErrorText("list", "word"),
+      error,
+      response,
+    });
   }
 };
 
@@ -141,7 +151,7 @@ const update = async (request, response) => {
 
     response.send({ success: true });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("update", "word"),
       error,
       response,
@@ -198,7 +208,7 @@ const updateTags = async (request, response) => {
         return response.sendStatus(404);
     }
 
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("updateTags", "word"),
       error,
       response,

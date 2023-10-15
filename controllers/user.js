@@ -1,5 +1,5 @@
 import { prisma } from "../app.js";
-import { generateErrorText, sendError } from "../helpers/api.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 
 const list = async (request, response) => {
   try {
@@ -10,7 +10,7 @@ const list = async (request, response) => {
 
     return response.status(200).json({ success: true, data });
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("list", "user"),
       error,
       response,
@@ -30,7 +30,7 @@ const show = async (request, response) => {
 
     return response.status(200).json(user);
   } catch (error) {
-    sendError({
+    sendHttp500({
       errorText: generateErrorText("show", "user"),
       error,
       response,
