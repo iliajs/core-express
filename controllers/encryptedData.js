@@ -2,18 +2,36 @@ import { credentialRecordTypes } from "../settings/index.js";
 import { validationResult } from "express-validator";
 import { Op } from "sequelize";
 import { addDays, format } from "date-fns";
+import { prisma } from "../app.js";
+import fs from "fs/promises";
+import { CREDENTIALS_FILE_PATH } from "../settings/files.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 
 const get = async (request, response) => {
-  const data = await Credential.findOne({
-    where: {
-      type: credentialRecordTypes.main,
-    },
-  });
+  try {
+    const encryptedData = await fs.readFile(CREDENTIALS_FILE_PATH, "utf8");
 
-  return response.status(200).json({ success: true, data });
+    return response
+      .status(200)
+      .json({ encryptedData: encryptedData.replace(/\\/g, "") });
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("get", "encryptedRecord"),
+      error,
+      response,
+    });
+  }
 };
 
 const update = async (request, response) => {
+  // fs.writeFile(CREDENTIALS_FILE_PATH, "This is awesome!", (err) => {
+  //   console.log("A1", err);
+  // });
+
+  return response.status(200).json({ hello: "hello" });
+};
+
+const updateOld = async (request, response) => {
   const validator = validationResult(request);
   if (!validator.isEmpty()) {
     return response.status(403).json({ errors: validator.array() });
@@ -25,7 +43,7 @@ const update = async (request, response) => {
 
   // Update or create main record.
   try {
-    mainRecord = await Credential.findOne({
+    mainRecord = await prisma.encryptedRecord.findFirst({
       where: {
         type: credentialRecordTypes.main,
       },
@@ -35,7 +53,10 @@ const update = async (request, response) => {
     console.log(1, mainRecord);
 
     if (!mainRecord) {
-      await Credential.create({ data, type: credentialRecordTypes.main });
+      await prisma.encryptedRecord.create({
+        data,
+        type: credentialRecordTypes.main,
+      });
 
       return response.status(200).json({
         created: !mainRecord,
@@ -43,7 +64,7 @@ const update = async (request, response) => {
         yesterdayBackupCreated,
       });
     } else {
-      await Credential.update(
+      await prisma.encryptedRecord.update(
         { data },
         {
           where: {
@@ -65,7 +86,7 @@ const update = async (request, response) => {
     const yesterdayStart = format(yesterday, "yyyy-MM-dd 00:00");
     const yesterdayEnd = format(yesterday, "yyyy-MM-dd 23:59");
 
-    const yesterdayBackup = await Credential.findOne({
+    const yesterdayBackup = await prisma.encryptedRecord.findFirst({
       where: {
         createdAt: {
           [Op.between]: [yesterdayStart, yesterdayEnd],
@@ -78,7 +99,9 @@ const update = async (request, response) => {
       delete mainRecord.id;
       mainRecord.type = credentialRecordTypes.backup;
       mainRecord.createdAt = yesterdayStart;
-      yesterdayBackupCreated = !!(await Credential.create(mainRecord));
+      yesterdayBackupCreated = !!(await prisma.encryptedRecord.create(
+        mainRecord
+      ));
     }
   }
 

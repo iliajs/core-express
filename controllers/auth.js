@@ -30,6 +30,8 @@ const login = async (request, response) => {
       expiresIn: "7d",
     });
 
+    delete user.hash;
+
     return response.status(200).json({ jwt: token, user });
   } catch (error) {
     sendHttp500({

@@ -19,8 +19,8 @@ export const routes = {
   // Google drive.
   googleDrive: "/google-drive",
 
-  // Credential.
-  credential: "/credential",
+  // EncryptedRecord.
+  encryptedData: "/encryptedData",
 
   // Word.
   tag: "/tag",
