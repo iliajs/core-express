@@ -1,5 +1,5 @@
 import auth from "./controllers/auth.js";
-import encryptedData from "./controllers/encryptedData.js";
+import credential from "./controllers/credential.js";
 import googleDrive from "./controllers/googleDrive.js";
 import system from "./controllers/system.js";
 import tag from "./controllers/tag.js";
@@ -43,9 +43,9 @@ export const router = (app) => {
   app.get(routes.user, user.list);
   app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it active?
 
-  // Encrypted Record.
-  app.get(routes.encryptedData, body("username").notEmpty(), encryptedData.get);
-  app.post(routes.encryptedData, body("data").notEmpty(), encryptedData.update);
+  // Credential.
+  app.get(routes.credential, body("username").notEmpty(), credential.show);
+  app.post(routes.credential, body("data").notEmpty(), credential.update);
 
   // Tags.
   app.delete(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.destroy);
@@ -59,6 +59,7 @@ export const router = (app) => {
     query("wordId").notEmpty().isUUID(),
     translation.list
   );
+
   app.post(
     routes.translation,
     query("wordId").notEmpty().isUUID(),
