@@ -43,9 +43,9 @@ export const router = (app) => {
   app.get(routes.user, user.list);
   app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it active?
 
-  // Credentials.
-  app.get(routes.credential, body("username").notEmpty(), credential.get);
-  app.put(routes.credential, body("data").notEmpty(), credential.update);
+  // Credential.
+  app.get(routes.credential, body("username").notEmpty(), credential.show);
+  app.post(routes.credential, body("data").notEmpty(), credential.update);
 
   // Tags.
   app.delete(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.destroy);
@@ -59,6 +59,7 @@ export const router = (app) => {
     query("wordId").notEmpty().isUUID(),
     translation.list
   );
+
   app.post(
     routes.translation,
     query("wordId").notEmpty().isUUID(),

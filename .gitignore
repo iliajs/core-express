@@ -1,6 +1,11 @@
+# Folders.
+.idea
+encryptedData
 node_modules
+
+# Files.
 .env
 .env.production
-.idea
 google_drive_service.json
+
 

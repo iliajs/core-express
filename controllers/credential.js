@@ -1,92 +1,46 @@
-import { credentialRecordTypes } from "../settings/index.js";
 import { validationResult } from "express-validator";
-import { Op } from "sequelize";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
+import fs from "fs/promises";
+import { CREDENTIALS_FILE } from "../settings/files.js";
+import { generateErrorText, sendHttp500 } from "../helpers/api.js";
+import { createCredentialFileBackupIfNotExist } from "../helpers/controllers.js";
 
-const get = async (request, response) => {
-  const data = await Credential.findOne({
-    where: {
-      type: credentialRecordTypes.main,
-    },
-  });
+const show = async (request, response) => {
+  try {
+    const encryptedData = await fs.readFile(CREDENTIALS_FILE, "utf8");
 
-  return response.status(200).json({ success: true, data });
+    return response.status(200).json(encryptedData.replace(/\\/g, ""));
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("get", "credential"),
+      error,
+      response,
+    });
+  }
 };
 
 const update = async (request, response) => {
   const validator = validationResult(request);
-  if (!validator.isEmpty()) {
-    return response.status(403).json({ errors: validator.array() });
-  }
-
-  const { data } = request.body;
-  let mainRecord = null;
-  let yesterdayBackupCreated = false;
-
-  // Update or create main record.
   try {
-    mainRecord = await Credential.findOne({
-      where: {
-        type: credentialRecordTypes.main,
-      },
-      raw: true,
-    });
-
-    console.log(1, mainRecord);
-
-    if (!mainRecord) {
-      await Credential.create({ data, type: credentialRecordTypes.main });
-
-      return response.status(200).json({
-        created: !mainRecord,
-        updated: !!mainRecord,
-        yesterdayBackupCreated,
-      });
-    } else {
-      await Credential.update(
-        { data },
-        {
-          where: {
-            type: credentialRecordTypes.main,
-          },
-        }
-      );
+    if (!validator.isEmpty()) {
+      return response.status(403).json({ errors: validator.array() });
     }
-  } catch (e) {
-    console.error(e);
-    return response.status(500).json({
-      error: "Cannot create or update main record.",
+
+    const { data } = request.body;
+
+    const today = format(new Date(), "yyyyMMdd");
+    await createCredentialFileBackupIfNotExist(today);
+
+    await fs.writeFile(CREDENTIALS_FILE, data);
+
+    return response.sendStatus(200);
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("update", "credential"),
+      error,
+      response,
     });
   }
-
-  // Create backup.
-  if (mainRecord) {
-    const yesterday = addDays(new Date(), -1);
-    const yesterdayStart = format(yesterday, "yyyy-MM-dd 00:00");
-    const yesterdayEnd = format(yesterday, "yyyy-MM-dd 23:59");
-
-    const yesterdayBackup = await Credential.findOne({
-      where: {
-        createdAt: {
-          [Op.between]: [yesterdayStart, yesterdayEnd],
-        },
-        type: credentialRecordTypes.backup,
-      },
-    });
-
-    if (!yesterdayBackup) {
-      delete mainRecord.id;
-      mainRecord.type = credentialRecordTypes.backup;
-      mainRecord.createdAt = yesterdayStart;
-      yesterdayBackupCreated = !!(await Credential.create(mainRecord));
-    }
-  }
-
-  return response.status(200).json({
-    updated: !!mainRecord,
-    created: !mainRecord,
-    yesterdayBackupCreated,
-  });
 };
 
-export default { get, update };
+export default { show, update };
