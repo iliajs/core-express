@@ -6,6 +6,7 @@ import tag from "./controllers/tag.js";
 import translation from "./controllers/translation.js";
 import user from "./controllers/user.js";
 import word from "./controllers/word.js";
+import schedule from "./controllers/schedule.js";
 
 import { routes } from "./settings/routes.js";
 
@@ -46,6 +47,10 @@ export const router = (app) => {
   // Credential.
   app.get(routes.credential, body("username").notEmpty(), credential.show);
   app.post(routes.credential, body("data").notEmpty(), credential.update);
+
+  // Schedule.
+  app.get(routes.schedule, body("username").notEmpty(), schedule.show);
+  app.post(routes.schedule, schedule.update);
 
   // Tags.
   app.delete(`${routes.tag}/:id`, param("id").notEmpty().isUUID(), tag.destroy);

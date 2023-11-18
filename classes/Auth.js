@@ -26,4 +26,10 @@ export class Authorization {
       return null;
     }
   }
+
+  getUser() {
+    const userCopy = { ...this.user };
+    delete userCopy.hash;
+    return userCopy;
+  }
 }
