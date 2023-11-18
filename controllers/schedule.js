@@ -12,6 +12,13 @@ const show = async (request, response) => {
 
     return response.status(200).json(JSON.parse(data));
   } catch (error) {
+    if (error.errno === -2) {
+      const file = `${SCHEDULE_FILES_PATH}/${auth.user.id}`;
+      const data = { schedule: [] };
+      await fs.writeFile(file, JSON.stringify(data), { flag: "w" });
+      return response.json(data);
+    }
+
     sendHttp500({
       errorText: generateErrorText("get", "schedule"),
       error,
