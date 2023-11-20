@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import { SCHEDULE_FILES_PATH } from "../settings/files.js";
 import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import { auth } from "../app.js";
+import { createScheduleFileBackupIfNotExist } from "../helpers/controllers.js";
 
 const show = async (request, response) => {
   try {
@@ -37,6 +38,8 @@ const update = async (request, response) => {
 
     const payload = request.body;
     const file = `${SCHEDULE_FILES_PATH}/${auth.user.id}`;
+
+    await createScheduleFileBackupIfNotExist();
 
     await fs.writeFile(file, JSON.stringify(payload), { flag: "w" });
 

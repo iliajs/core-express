@@ -1,6 +1,7 @@
 # Folders.
 .idea
 encryptedData
+fileStorage/*
 node_modules
 
 # Files.
