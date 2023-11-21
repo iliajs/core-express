@@ -22,6 +22,9 @@ export const routes = {
   // Credential.
   credential: "/credential",
 
+  // Schedule.
+  schedule: "/schedule",
+
   // Word.
   tag: "/tag",
   translation: "/translation",
