@@ -64,6 +64,8 @@ model User {
   updatedAt        DateTime?         @db.Timestamptz(6)
   username         String            @unique @db.VarChar(255)
   words            Word[]
+  clients          Client[]
+  TimeSlot         TimeSlot[]
 }
 
 model Word {
@@ -75,4 +77,26 @@ model Word {
   updatedAt    DateTime?     @db.Timestamptz(6)
   user         User          @relation(fields: [userId], references: [id])
   userId       String        @db.Uuid
+}
+
+model Client {
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String     @unique @db.VarChar(255)
+  timeslot  TimeSlot[]
+  updatedAt DateTime?  @db.Timestamptz(6)
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @db.Uuid
+}
+
+model TimeSlot {
+  client    Client    @relation(fields: [clientId], references: [id])
+  clientId  String    @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  datetime  DateTime  @db.Timestamptz(6)
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique @db.VarChar(255)
+  updatedAt DateTime? @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @db.Uuid
 }
