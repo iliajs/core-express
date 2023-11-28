@@ -1,9 +1,8 @@
 import "dotenv/config";
+
 import { ExpressOperation } from "./classes/ExpressOperation.js";
 import { PrismaClient } from "@prisma/client";
 import { Authorization } from "./classes/Auth.js";
-
-// Database.
 
 export const prisma = new PrismaClient();
 export const auth = new Authorization();

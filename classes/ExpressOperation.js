@@ -1,10 +1,10 @@
 import express from "express";
 import { UI_FILE_PATH } from "../settings/index.js";
 import { routesWithoutAuthorization } from "../settings/routes.js";
-import { serverPort } from "../settings/port.js";
-import { showServerInfo } from "../helpers/logs.js";
+import { showServerInfo } from "../helpers/log.js";
 import { router } from "../router.js";
 import { auth } from "../app.js";
+import { serverPort } from "../settings/system.js";
 
 export class ExpressOperation {
   constructor() {

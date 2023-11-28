@@ -1,9 +1,9 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
-import { BCRYPT_ROUND_NUMBER } from "../settings/security.js";
 import jwt from "jsonwebtoken";
 import { prisma } from "../app.js";
 import { generateErrorText, sendHttp500 } from "../helpers/api.js";
+import { BCRYPT_ROUND_NUMBER } from "../settings/system.js";
 
 const login = async (request, response) => {
   try {
