@@ -7,96 +7,84 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model EncryptedRecord {
-  createdAt DateTime  @db.Timestamptz(6)
-  data      Bytes
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  username     String        @unique @db.VarChar(255)
+  email        String        @unique @db.VarChar(255)
+  hash         String        @db.VarChar(60)
+  firstName    String        @db.VarChar(255)
+  lastName     String        @db.VarChar(255)
+  words        Word[]
+  translations Translation[]
+  tags         Tag[]
+  tagsOnWords  TagsOnWords[]
+  clients      Client[]
+  timeSlots    TimeSlot[]
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime?     @db.Timestamptz(6)
+}
+
+model Word {
+  id           String        @id @default(uuid()) @db.Uuid
+  title        String        @unique @db.VarChar(255)
+  translations Translation[]
+  tags         TagsOnWords[]
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String        @db.Uuid
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime?     @db.Timestamptz(6)
+}
+
+model Translation {
   id        String    @id @default(uuid()) @db.Uuid
-  type      String    @db.VarChar(255)
-  updatedAt DateTime? @db.Timestamptz(6)
+  text      String    @db.VarChar(1000)
+  word      Word      @relation(fields: [wordId], references: [id])
+  wordId    String    @db.Uuid
   user      User      @relation(fields: [userId], references: [id])
   userId    String    @db.Uuid
+  updatedAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
 }
 
 model Tag {
-  createdAt DateTime      @default(now()) @db.Timestamptz(6)
   id        String        @id @default(uuid()) @db.Uuid
   name      String        @unique @db.VarChar(255)
-  updatedAt DateTime?     @db.Timestamptz(6)
+  words     TagsOnWords[]
   user      User          @relation(fields: [userId], references: [id])
   userId    String        @db.Uuid
-  words     TagsOnWords[]
+  createdAt DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime?     @db.Timestamptz(6)
 }
 
 model TagsOnWords {
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  word      Word     @relation(fields: [wordId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  wordId    String   @db.Uuid
   tag       Tag      @relation(fields: [tagId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   tagId     String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
-  word      Word     @relation(fields: [wordId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  wordId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@id([wordId, tagId])
 }
 
-model Translation {
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  id        String    @id @default(uuid()) @db.Uuid
-  text      String    @db.VarChar(1000)
-  updatedAt DateTime? @db.Timestamptz(6)
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @db.Uuid
-  word      Word      @relation(fields: [wordId], references: [id])
-  wordId    String    @db.Uuid
-}
-
-model User {
-  createdAt        DateTime          @default(now()) @db.Timestamptz(6)
-  encryptedRecords EncryptedRecord[]
-  email            String            @unique @db.VarChar(255)
-  firstName        String            @db.VarChar(255)
-  hash             String            @db.VarChar(60)
-  id               String            @id @default(uuid()) @db.Uuid
-  tags             Tag[]
-  tagsOnWords      TagsOnWords[]
-  translations     Translation[]
-  lastName         String            @db.VarChar(255)
-  updatedAt        DateTime?         @db.Timestamptz(6)
-  username         String            @unique @db.VarChar(255)
-  words            Word[]
-  clients          Client[]
-  TimeSlot         TimeSlot[]
-}
-
-model Word {
-  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
-  id           String        @id @default(uuid()) @db.Uuid
-  tags         TagsOnWords[]
-  title        String        @unique @db.VarChar(255)
-  translations Translation[]
-  updatedAt    DateTime?     @db.Timestamptz(6)
-  user         User          @relation(fields: [userId], references: [id])
-  userId       String        @db.Uuid
-}
-
 model Client {
-  createdAt DateTime   @default(now()) @db.Timestamptz(6)
   id        String     @id @default(uuid()) @db.Uuid
   name      String     @unique @db.VarChar(255)
-  timeslot  TimeSlot[]
-  updatedAt DateTime?  @db.Timestamptz(6)
+  timeSlots TimeSlot[]
   user      User       @relation(fields: [userId], references: [id])
   userId    String     @db.Uuid
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime?  @db.Timestamptz(6)
 }
 
 model TimeSlot {
+  id        String    @id @default(uuid()) @db.Uuid
   client    Client    @relation(fields: [clientId], references: [id])
   clientId  String    @db.Uuid
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
   datetime  DateTime  @db.Timestamptz(6)
-  id        String    @id @default(uuid()) @db.Uuid
-  name      String    @unique @db.VarChar(255)
-  updatedAt DateTime? @db.Timestamptz(6)
   user      User      @relation(fields: [userId], references: [id])
   userId    String    @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
 }
