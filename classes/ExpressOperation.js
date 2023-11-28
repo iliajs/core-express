@@ -5,6 +5,7 @@ import { showServerInfo } from "../helpers/log.js";
 import { router } from "../router.js";
 import { auth } from "../app.js";
 import { serverPort } from "../settings/system.js";
+import _ from "lodash";
 
 export class ExpressOperation {
   constructor() {
@@ -15,8 +16,14 @@ export class ExpressOperation {
     app.use(express.urlencoded()); // To support URL-encoded bodies.
 
     app.use(async function (request, response, next) {
-      if (process.env.ORIGIN) {
-        response.header("Access-Control-Allow-Origin", process.env.ORIGIN);
+      let corsWhitelist = process.env.CORS_WHITELIST.split("|").filter(
+        (item) => !!item
+      );
+
+      corsWhitelist = _.uniq(corsWhitelist);
+
+      if (corsWhitelist.includes(request.headers.origin)) {
+        response.header("Access-Control-Allow-Origin", request.headers.origin);
 
         response.header(
           "Access-Control-Allow-Headers",
