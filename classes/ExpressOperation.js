@@ -1,10 +1,11 @@
 import express from "express";
 import { UI_FILE_PATH } from "../settings/index.js";
 import { routesWithoutAuthorization } from "../settings/routes.js";
-import { serverPort } from "../settings/port.js";
-import { showServerInfo } from "../helpers/logs.js";
+import { showServerInfo } from "../helpers/log.js";
 import { router } from "../router.js";
 import { auth } from "../app.js";
+import { serverPort } from "../settings/system.js";
+import _ from "lodash";
 
 export class ExpressOperation {
   constructor() {
@@ -15,14 +16,20 @@ export class ExpressOperation {
     app.use(express.urlencoded()); // To support URL-encoded bodies.
 
     app.use(async function (request, response, next) {
-      // Because Chrome doesn't support CORS for connections from localhost we need this for local development.
-      // TODO Check that in production it's false.
-      if (process.env.ALLOW_ORIGIN_ALL === "true") {
-        response.header("Access-Control-Allow-Origin", "*");
+      let corsWhitelist = process.env.CORS_WHITELIST.split("|").filter(
+        (item) => !!item
+      );
+
+      corsWhitelist = _.uniq(corsWhitelist);
+
+      if (corsWhitelist.includes(request.headers.origin)) {
+        response.header("Access-Control-Allow-Origin", request.headers.origin);
+
         response.header(
           "Access-Control-Allow-Headers",
           "Origin, X-Requested-With, Content-Type, Accept, Authorization"
         );
+
         response.header(
           "Access-Control-Allow-Methods",
           "GET, POST, OPTIONS, PUT, DELETE"
