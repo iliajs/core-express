@@ -32,7 +32,7 @@ export class ExpressOperation {
 
         response.header(
           "Access-Control-Allow-Methods",
-          "GET, POST, OPTIONS, PUT, DELETE"
+          "GET, POST, OPTIONS, PUT, DELETE, PATCH"
         );
       }
 

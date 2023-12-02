@@ -19,11 +19,17 @@ export const routes = {
   // Google drive.
   googleDrive: "/google-drive",
 
+  // Client.
+  client: "/client",
+
   // Credential.
   credential: "/credential",
 
   // Schedule.
   schedule: "/schedule",
+
+  // File storage.
+  fileStorage: "/fileStorage",
 
   // Word.
   tag: "/tag",
