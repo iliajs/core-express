@@ -70,7 +70,7 @@ const show = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { id } = request.params;

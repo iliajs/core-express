@@ -9,7 +9,7 @@ const login = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.status(403).json({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { user: inputUser, password } = request.body;
@@ -46,7 +46,7 @@ const register = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.status(403).json({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { username, email, firstName, lastName, password } = request.body;

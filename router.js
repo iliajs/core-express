@@ -9,8 +9,9 @@ import fileStorage from "./controllers/fileStorage.js";
 
 import { routes } from "./settings/routes.js";
 
-import { body, param, query } from "express-validator";
+import { body, oneOf, param, query } from "express-validator";
 import client from "./controllers/client.js";
+import timeSlot from "./controllers/timeSlot.js";
 
 export const router = (app) => {
   // System.
@@ -21,11 +22,11 @@ export const router = (app) => {
   app.post(
     routes.register,
     [
-      body("username").notEmpty().trim(),
-      body("email").isEmail().trim(),
-      body("firstName").notEmpty().trim(),
-      body("lastName").notEmpty().trim(),
-      body("password").notEmpty().trim(),
+      body("username").trim().notEmpty(),
+      body("email").trim().isEmail(),
+      body("firstName").trim().notEmpty(),
+      body("lastName").trim().notEmpty(),
+      body("password").trim().notEmpty(),
     ],
     auth.register
   );
@@ -34,15 +35,15 @@ export const router = (app) => {
   app.post(
     routes.login,
     [
-      body("user").isLength({ min: 2, max: 50 }),
-      body("password").isStrongPassword({ minSymbols: 0 }),
+      body("user").trim().isLength({ min: 2, max: 50 }),
+      body("password").trim().isStrongPassword({ minSymbols: 0 }),
     ],
     auth.login
   );
 
   // Users.
   app.get(routes.user, user.list);
-  app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it active?
+  // app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it actual?
 
   // File storage.
   app.put(
@@ -101,14 +102,44 @@ export const router = (app) => {
     client.destroy
   );
 
+  // Time slots.
+  const timeSlotVerifyParams = [
+    oneOf(
+      [
+        query("clientId").isUUID(),
+        body("comment").trim().isLength({ min: 1, max: 500 }),
+      ],
+      { message: "At least one clientId or comment must be provided" }
+    ),
+
+    body("date").optional().isLength({ min: 9, max: 9 }),
+    body("time").isLength({ min: 8, max: 8 }),
+  ];
+
+  app.post(routes.timeSlot, timeSlotVerifyParams, timeSlot.createOrUpdate);
+
+  app.put(
+    `${routes.timeSlot}/:id`,
+    [param("id").isUUID(), ...timeSlotVerifyParams],
+    timeSlot.createOrUpdate
+  );
+
+  app.get(routes.timeSlot, timeSlot.list);
+
+  app.delete(
+    `${routes.timeSlot}/:id`,
+    param("id").notEmpty().isUUID(),
+    timeSlot.destroy
+  );
+
   // Words.
-  app.post(routes.word, word.create);
+  app.post(routes.word, word.create); // TODO Add validation.
 
   app.get(routes.word, word.list);
 
   app.get(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.show);
 
-  app.put(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.update);
+  app.put(`${routes.word}/:id`, param("id").notEmpty().isUUID(), word.update); // TODO Add body validation.
 
   app.post(
     `${routes.word}/:wordId/updateTags`,

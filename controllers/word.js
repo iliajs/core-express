@@ -7,7 +7,7 @@ const create = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { title } = request.body;
@@ -38,7 +38,7 @@ const destroy = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { id } = request.params;
@@ -71,7 +71,7 @@ const list = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const data = await prisma.word.findMany({
@@ -95,7 +95,7 @@ const show = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { id } = request.params;
@@ -119,7 +119,7 @@ const update = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { id } = request.params;
@@ -163,7 +163,7 @@ const updateTags = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { wordId } = request.params;

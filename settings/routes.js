@@ -22,11 +22,8 @@ export const routes = {
   // Client.
   client: "/client",
 
-  // Credential.
-  credential: "/credential",
-
-  // Schedule.
-  schedule: "/schedule",
+  // Time slot.
+  timeSlot: "/timeSlot",
 
   // File storage.
   fileStorage: "/fileStorage",

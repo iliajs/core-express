@@ -6,7 +6,7 @@ const create = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { wordId } = request.query;
@@ -16,7 +16,7 @@ const create = async (request, response) => {
     if (!word) {
       return response.sendStatus(404);
     }
-
+    //
     const data = await prisma.translation.create({
       data: { text, wordId, userId: auth.user.id },
     });
@@ -35,7 +35,7 @@ const list = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.send({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { wordId } = request.query;
@@ -49,6 +49,7 @@ const list = async (request, response) => {
     const data = await prisma.translation.findMany({
       where: {
         wordId: wordId,
+        userId: auth.user.id,
       },
       include: { word: true },
     });
