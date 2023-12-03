@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "TimeSlot" ALTER COLUMN "time" SET DATA TYPE VARCHAR(8);

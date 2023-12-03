@@ -21,14 +21,14 @@ const createOrUpdate = async (request, response) => {
       return response.sendStatus(404);
     }
 
-    const { clientId } = request.query;
+    const { date, time, comment, clientId } = request.body;
 
-    const { date, time, comment } = request.body;
+    if (clientId) {
+      const client = await prisma.client.findFirst({ where: { id: clientId } });
 
-    const client = await prisma.client.findFirst({ where: { id: clientId } });
-
-    if (!client) {
-      return response.status(422).send("Client with this id is not found.");
+      if (!client) {
+        return response.status(422).send("Client with this id is not found.");
+      }
     }
 
     let result;

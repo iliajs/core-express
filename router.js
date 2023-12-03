@@ -106,13 +106,13 @@ export const router = (app) => {
   const timeSlotVerifyParams = [
     oneOf(
       [
-        query("clientId").isUUID(),
+        body("clientId").isUUID(),
         body("comment").trim().isLength({ min: 1, max: 500 }),
       ],
       { message: "At least one clientId or comment must be provided" }
     ),
 
-    body("date").optional().isLength({ min: 9, max: 9 }),
+    body("date").optional().isNumeric(),
     body("time").isLength({ min: 8, max: 8 }),
   ];
 
