@@ -20,6 +20,7 @@ model User {
   tagsOnWords  TagsOnWords[]
   clients      Client[]
   timeSlots    TimeSlot[]
+  config       Json?
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime?     @db.Timestamptz(6)
 }

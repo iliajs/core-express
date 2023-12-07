@@ -41,6 +41,9 @@ export const router = (app) => {
     auth.login
   );
 
+  // Get auth user.
+  app.get(routes.getAuthUser, auth.getAuthUser);
+
   // Users.
   app.get(routes.user, user.list);
   // app.get(`${routes.user}/:id`, [param("id").exists().isUUID()], user.show); // TODO Is it actual?

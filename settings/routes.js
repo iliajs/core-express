@@ -9,6 +9,7 @@ export const routes = {
   register: "/register",
   login: "/login",
   authorization: "/authorization",
+  getAuthUser: "/getAuthUser",
 
   // User.
   user: "/user",
