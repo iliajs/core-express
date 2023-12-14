@@ -93,11 +93,30 @@ const getAuthUser = async (request, response) => {
     return response.status(200).json(_.omit(user, "hash"));
   } catch (error) {
     sendHttp500({
-      errorText: generateErrorText("get", "user"),
+      errorText: generateErrorText("get", "authUser"),
       error,
       response,
     });
   }
 };
 
-export default { register, login, getAuthUser };
+const saveAuthUserConfig = async (request, response) => {
+  try {
+    const { config } = request.body;
+
+    await prisma.user.update({
+      where: { id: auth.user.id },
+      data: { config },
+    });
+
+    response.send({ success: true, data: config });
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("save", "authUserConfig"),
+      error,
+      response,
+    });
+  }
+};
+
+export default { register, login, getAuthUser, saveAuthUserConfig };

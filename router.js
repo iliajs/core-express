@@ -41,8 +41,13 @@ export const router = (app) => {
     auth.login
   );
 
-  // Get auth user.
+  // Auth user operations.
   app.get(routes.getAuthUser, auth.getAuthUser);
+  app.put(
+    routes.saveAuthUserConfig,
+    [body("config").notEmpty().isJSON()],
+    auth.saveAuthUserConfig
+  );
 
   // Users.
   app.get(routes.user, user.list);
