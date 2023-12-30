@@ -1,6 +1,6 @@
 export const fileStorageConfig = {
-  schedule: { name: "schedule", returnJson: true },
-  credentials: { name: "credentials" },
+  schedule: { name: "schedule", parseJson: true },
+  credentials: { name: "credentials", prepareEncryptedData: true },
 };
 
 export const fileStoragePath = "./fileStorage";

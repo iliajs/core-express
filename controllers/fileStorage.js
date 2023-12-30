@@ -12,14 +12,22 @@ const show = async (request, response) => {
   const file = `${path}/${auth.user.id}`;
 
   try {
-    const data = await fs.readFile(file, "utf8");
+    let data = await fs.readFile(file, "utf8");
 
-    const returnJson = fileStorageConfig?.[target]?.returnJson;
+    const config = fileStorageConfig?.[target];
 
-    return response.send(returnJson ? JSON.parse(data) : data);
+    if (config.parseJson) {
+      data = JSON.parse(data);
+    }
+
+    if (config.prepareEncryptedData) {
+      data = data.replace(/\\/g, "");
+    }
+
+    return response.send(data);
   } catch (error) {
     if (error.errno === -2) {
-      return response.sendStatus(200);
+      return response.sendStatus(500); // TODO Was it correct status 200 here?
     }
 
     sendHttp500({
@@ -38,13 +46,21 @@ const update = async (request, response) => {
   const file = `${path}/${auth.user.id}`;
 
   try {
-    const payload = request.body;
+    let payload = request.body;
 
     await createFileStorageBackup(target);
 
-    const returnJson = fileStorageConfig?.[target]?.returnJson;
+    const config = fileStorageConfig?.[target];
 
-    await fs.writeFile(file, returnJson ? JSON.stringify(payload) : payload, {
+    if (config.parseJson) {
+      payload = JSON.stringify(payload);
+    }
+
+    if (config.prepareEncryptedData) {
+      payload = payload.encryptedData;
+    }
+
+    await fs.writeFile(file, payload, {
       flag: "w",
     });
 
