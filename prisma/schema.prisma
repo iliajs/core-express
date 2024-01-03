@@ -20,6 +20,7 @@ model User {
   tagsOnWords  TagsOnWords[]
   clients      Client[]
   timeSlots    TimeSlot[]
+  config       Json?
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime?     @db.Timestamptz(6)
 }
@@ -74,17 +75,21 @@ model Client {
   timeSlots TimeSlot[]
   user      User       @relation(fields: [userId], references: [id])
   userId    String     @db.Uuid
+  archived  Boolean?
   createdAt DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt DateTime?  @db.Timestamptz(6)
 }
 
 model TimeSlot {
   id        String    @id @default(uuid()) @db.Uuid
-  client    Client    @relation(fields: [clientId], references: [id])
-  clientId  String    @db.Uuid
-  datetime  DateTime  @db.Timestamptz(6)
+  client    Client?   @relation(fields: [clientId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  clientId  String?   @db.Uuid
+  date      Int?      @db.Integer
+  time      String    @db.VarChar(8)
   user      User      @relation(fields: [userId], references: [id])
   userId    String    @db.Uuid
+  comment   String?   @db.VarChar(500)
+  archived  Boolean?
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt DateTime? @db.Timestamptz(6)
 }

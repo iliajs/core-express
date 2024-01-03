@@ -1,15 +1,16 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { prisma } from "../app.js";
+import { auth, prisma } from "../app.js";
 import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import { BCRYPT_ROUND_NUMBER } from "../settings/system.js";
+import _ from "lodash";
 
 const login = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.status(403).json({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { user: inputUser, password } = request.body;
@@ -46,7 +47,7 @@ const register = async (request, response) => {
   try {
     const validator = validationResult(request);
     if (!validator.isEmpty()) {
-      return response.status(403).json({ errors: validator.array() });
+      return response.status(422).json({ errors: validator.array() });
     }
 
     const { username, email, firstName, lastName, password } = request.body;
@@ -81,4 +82,41 @@ const register = async (request, response) => {
   }
 };
 
-export default { login, register };
+const getAuthUser = async (request, response) => {
+  try {
+    const user = await prisma.user.findFirst({ where: { id: auth.user.id } });
+
+    if (!user) {
+      return response.sendStatus(404);
+    }
+
+    return response.status(200).json(_.omit(user, "hash"));
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("get", "authUser"),
+      error,
+      response,
+    });
+  }
+};
+
+const saveAuthUserConfig = async (request, response) => {
+  try {
+    const { config } = request.body;
+
+    await prisma.user.update({
+      where: { id: auth.user.id },
+      data: { config },
+    });
+
+    response.send({ success: true, data: config });
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("save", "authUserConfig"),
+      error,
+      response,
+    });
+  }
+};
+
+export default { register, login, getAuthUser, saveAuthUserConfig };

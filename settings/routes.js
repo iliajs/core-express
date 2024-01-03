@@ -4,11 +4,13 @@ export const routes = {
   system: "/system",
   favicon: "/favicon.ico",
 
-  // Authentication & authorization.
+  // Auth operations.
   auth_with_one_time_token: "/auth-with-one-time-token", // TODO
   register: "/register",
   login: "/login",
   authorization: "/authorization",
+  getAuthUser: "/getAuthUser",
+  saveAuthUserConfig: "/saveAuthUserConfig",
 
   // User.
   user: "/user",
@@ -19,11 +21,14 @@ export const routes = {
   // Google drive.
   googleDrive: "/google-drive",
 
-  // Credential.
-  credential: "/credential",
+  // Client.
+  client: "/client",
 
-  // Schedule.
-  schedule: "/schedule",
+  // Time slot.
+  timeSlot: "/timeSlot",
+
+  // File storage.
+  fileStorage: "/fileStorage",
 
   // Word.
   tag: "/tag",
