@@ -12,8 +12,10 @@ export class TelegramProcessing {
     // Get updates from the telegram server.
     const updates = await botTelegram.getUpdates();
 
+    console.log("UPDATES", updates);
+
     // No incoming updates.
-    if (!updates || !updates.length) {
+    if (!updates?.length) {
       return;
     }
 
@@ -77,7 +79,8 @@ export class TelegramProcessing {
         telegramUserId,
         TOKEN_TYPES.oneTime
       );
-      let answer = "<b>Это ваш одноразовый токен для входа в приложение.</b>";
+      let answer =
+        "<b>Это ваш одноразовый токен для двухфакторной аутентификации.</b>";
       answer += `\n\n*************************************\n** ${token} **\n*************************************`;
       answer +=
         "\n\n<i>Действителен 5 минут с момента получения и только для одного входа.</i>";

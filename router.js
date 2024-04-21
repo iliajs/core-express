@@ -12,6 +12,7 @@ import { routes } from "./settings/routes.js";
 import { body, oneOf, param, query } from "express-validator";
 import client from "./controllers/client.js";
 import timeSlot from "./controllers/timeSlot.js";
+import notify from "./controllers/notify.js";
 
 export const router = (app) => {
   // System.
@@ -159,5 +160,18 @@ export const router = (app) => {
     `${routes.word}/:id`,
     param("id").notEmpty().isUUID(),
     word.destroy
+  );
+
+  // Notify.
+  app.post(
+    routes.notify,
+    [
+      body("token").isUUID(),
+      body("sourceId").isLength({ min: 1, max: 32 }),
+      body("recipientRole").isLength({ min: 1, max: 32 }),
+      body("notifyType").isLength({ min: 1, max: 32 }),
+      body("message").isLength({ min: 1, max: 4096 }),
+    ],
+    notify.run
   );
 };

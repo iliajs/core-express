@@ -34,6 +34,9 @@ export const routes = {
   tag: "/tag",
   translation: "/translation",
   word: "/word",
+
+  // Notify.
+  notify: "/notify",
 };
 
 export const routesWithoutAuthorization = [
@@ -42,5 +45,6 @@ export const routesWithoutAuthorization = [
   routes.login,
   routes.register,
   routes.root, // TODO
-  routes.telegram_webhook,
+  routes.notify,
+  //routes.telegram_webhook, // Switch off for now, use long polling.
 ];
