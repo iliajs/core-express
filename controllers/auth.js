@@ -50,9 +50,11 @@ const register = async (request, response) => {
       return response.status(422).json({ errors: validator.array() });
     }
 
-    const { username, email, firstName, lastName, password } = request.body;
+    let { username, email, firstName, lastName, password } = request.body;
     const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
     const hash = bcrypt.hashSync(password, salt);
+
+    username = username || email;
 
     const user = await prisma.user.findFirst({
       where: { OR: [{ username }, { email }] },

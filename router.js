@@ -23,11 +23,11 @@ export const router = (app) => {
   app.post(
     routes.register,
     [
-      body("username").trim().notEmpty(),
+      body("username").trim(), // TODO Improve .notEmpty(),
       body("email").trim().isEmail(),
-      body("firstName").trim().notEmpty(),
-      body("lastName").trim().notEmpty(),
-      body("password").trim().notEmpty(),
+      body("firstName").trim(), // TODO Improve .notEmpty(),
+      body("lastName").trim(), // TODO Improve .notEmpty(),
+      body("password").trim().isStrongPassword({ minSymbols: 0 }),
     ],
     auth.register
   );
