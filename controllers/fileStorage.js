@@ -26,8 +26,9 @@ const show = async (request, response) => {
 
     return response.send(data);
   } catch (error) {
+    // File not exist case.
     if (error.errno === -2) {
-      return response.sendStatus(500); // TODO Was it correct status 200 here?
+      return response.status(200).json({ isEmptyData: true });
     }
 
     sendHttp500({
