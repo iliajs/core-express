@@ -37,6 +37,9 @@ export const routes = {
 
   // Notify.
   notify: "/notify",
+
+  // Email.
+  email: "/email",
 };
 
 export const routesWithoutAuthorization = [

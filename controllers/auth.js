@@ -61,7 +61,16 @@ const register = async (request, response) => {
     });
 
     if (user) {
-      return response.status(409).json({ error: "already exists" });
+      return response
+        .status(422)
+        .json({
+          errors: [
+            {
+              path: "email",
+              customMessage: "User with the same email already exists",
+            },
+          ],
+        });
     }
 
     await prisma.user.create({

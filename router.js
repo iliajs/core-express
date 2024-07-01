@@ -13,6 +13,7 @@ import { body, oneOf, param, query } from "express-validator";
 import client from "./controllers/client.js";
 import timeSlot from "./controllers/timeSlot.js";
 import notify from "./controllers/notify.js";
+import email from "./controllers/email.js";
 
 export const router = (app) => {
   // System.
@@ -140,6 +141,9 @@ export const router = (app) => {
     param("id").notEmpty().isUUID(),
     timeSlot.destroy
   );
+
+  // Emails.
+  app.post(routes.email, email.send);
 
   // Words.
   app.post(routes.word, word.create); // TODO Add validation.
