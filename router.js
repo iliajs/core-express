@@ -29,6 +29,7 @@ export const router = (app) => {
       body("firstName").trim(), // TODO Improve .notEmpty(),
       body("lastName").trim(), // TODO Improve .notEmpty(),
       body("password").trim().isStrongPassword({ minSymbols: 0 }),
+      body("token").isLength({ min: 1, max: 2048 }),
     ],
     auth.register
   );

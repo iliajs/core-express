@@ -1,8 +1,3 @@
-import { generateErrorText, sendHttp500 } from "../helpers/api.js";
-import { validationResult } from "express-validator";
-import { notifySources } from "../settings/notify.js";
-import { TelegramApi } from "../api/TelegramApi.js";
-
 import Mailjet from "node-mailjet";
 
 const send = async (request, response) => {
@@ -11,7 +6,7 @@ const send = async (request, response) => {
     process.env.MAILJET_SECRET_KEY
   );
 
-  const maijetRequest = mailjet.post("send", { version: "v3.1" }).request({
+  const mailjetRequest = mailjet.post("send", { version: "v3.1" }).request({
     Messages: [
       {
         From: {
@@ -33,43 +28,13 @@ const send = async (request, response) => {
     ],
   });
 
-  maijetRequest
+  mailjetRequest
     .then(() => {
       response.status(200).json({ success: true });
     })
     .catch((err) => {
       response.status(500).json({ error: true });
     });
-
-  // try {
-  //   const validator = validationResult(request);
-  //   if (!validator.isEmpty()) {
-  //     return response.status(422).json({ errors: validator.array() });
-  //   }
-  //
-  //   // TODO This check should be in middleware.
-  //   if (request.body.token !== process.env.SITE_TOKEN) {
-  //     response.sendStatus(401);
-  //   }
-  //
-  //   const notifyConfig = notifySources[request.body.sourceId];
-  //
-  //   console.log("notify", notifyConfig);
-  //
-  //   const telegram = new TelegramApi();
-  //   await telegram.sendMessage(
-  //     notifyConfig.telegramUserId,
-  //     request.body.message
-  //   );
-  //
-  //   response.send({ success: true });
-  // } catch (error) {
-  //   sendHttp500({
-  //     errorText: generateErrorText("notify", "process"),
-  //     error,
-  //     response,
-  //   });
-  // }
 };
 
 export default { send };

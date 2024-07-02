@@ -50,7 +50,29 @@ const register = async (request, response) => {
       return response.status(422).json({ errors: validator.array() });
     }
 
-    let { username, email, firstName, lastName, password } = request.body;
+    let { username, email, firstName, lastName, password, token } =
+      request.body;
+
+    const formData = new FormData();
+    formData.append("secret", process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY);
+    formData.append("response", token);
+    const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+    const result = await fetch(url, {
+      body: formData,
+      method: "POST",
+    });
+    const outcome = await result.json();
+    if (!outcome.success) {
+      return response.status(422).json({
+        errors: [
+          {
+            path: "token",
+            customMessage: "Captcha was not verified",
+          },
+        ],
+      });
+    }
+
     const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
     const hash = bcrypt.hashSync(password, salt);
 
@@ -61,16 +83,14 @@ const register = async (request, response) => {
     });
 
     if (user) {
-      return response
-        .status(422)
-        .json({
-          errors: [
-            {
-              path: "email",
-              customMessage: "User with the same email already exists",
-            },
-          ],
-        });
+      return response.status(422).json({
+        errors: [
+          {
+            path: "email",
+            customMessage: "User with the same email already exists",
+          },
+        ],
+      });
     }
 
     await prisma.user.create({
