@@ -39,7 +39,7 @@ export const routes = {
   notify: "/notify",
 
   // Email.
-  email: "/email",
+  confirmEmail: "/confirmEmail",
 };
 
 export const routesWithoutAuthorization = [
@@ -49,5 +49,6 @@ export const routesWithoutAuthorization = [
   routes.register,
   routes.root, // TODO
   routes.notify,
+  routes.confirmEmail,
   //routes.telegram_webhook, // Switch off for now, use long polling.
 ];

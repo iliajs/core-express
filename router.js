@@ -144,7 +144,12 @@ export const router = (app) => {
   );
 
   // Emails.
-  app.post(routes.email, email.send);
+  // TODO Only for testing now. That's why should be disabled.
+  app.post(
+    routes.confirmEmail,
+    [body("email").isEmail(), body("code").isLength({ min: 6, max: 6 })],
+    email.confirm
+  );
 
   // Words.
   app.post(routes.word, word.create); // TODO Add validation.

@@ -5,6 +5,7 @@ import { auth, prisma } from "../app.js";
 import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import { BCRYPT_ROUND_NUMBER } from "../settings/system.js";
 import _ from "lodash";
+import { Email } from "../classes/Email.js";
 
 const login = async (request, response) => {
   try {
@@ -93,6 +94,8 @@ const register = async (request, response) => {
       });
     }
 
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
     await prisma.user.create({
       data: {
         firstName,
@@ -100,8 +103,30 @@ const register = async (request, response) => {
         hash,
         username,
         email,
+        authCode: code,
+        active: false,
       },
     });
+
+    const mailjetRequest = Email.send(
+      { email: "registration@self-platform.es", name: "Self-Platform.es" },
+      { email },
+      "Confirm Your Email",
+      "<h4>Dear customer!</h4>" +
+        'We are really happy that you are registered in our application <a href="http://self-platform.es">Self-Platform.es</a>' +
+        `<br/><br/>To confirm your email, please click <a href="http://self-platform.es/login?email=${email}&code=${code}">this link</a>` +
+        "<br /><br/>Thanks a lot and hope see you soon!"
+    );
+
+    mailjetRequest
+      .then(() => {
+        response.status(200).json({ created: true });
+      })
+      .catch((err) => {
+        response
+          .status(500)
+          .json({ errors: ["Email confirmation code was not sent"] });
+      });
 
     response.status(200).json({ created: true });
   } catch (error) {
