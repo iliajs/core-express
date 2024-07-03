@@ -2,10 +2,15 @@ import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { auth, prisma } from "../app.js";
-import { generateErrorText, sendHttp500 } from "../helpers/api.js";
+import {
+  generateErrorText,
+  sendCaptchaError,
+  sendHttp500,
+} from "../helpers/api.js";
 import { BCRYPT_ROUND_NUMBER } from "../settings/system.js";
 import _ from "lodash";
 import { Email } from "../classes/Email.js";
+import { Captcha } from "../classes/Captcha.js";
 
 const login = async (request, response) => {
   try {
@@ -14,11 +19,16 @@ const login = async (request, response) => {
       return response.status(422).json({ errors: validator.array() });
     }
 
-    const { user: inputUser, password } = request.body;
+    const { user: inputUser, password, token } = request.body;
+
+    if (!(await Captcha.check(token))) {
+      return sendCaptchaError(response);
+    }
 
     const user = await prisma.user.findFirst({
       where: {
-        OR: [{ username: inputUser }, { email: inputUser }],
+        email: inputUser,
+        active: true,
       },
     });
 
@@ -28,13 +38,13 @@ const login = async (request, response) => {
         .json({ error: "wrong credentials or user not found" });
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_PASSPHRASE, {
+    const jwtToken = jwt.sign({ userId: user.id }, process.env.JWT_PASSPHRASE, {
       expiresIn: "7d",
     });
 
     delete user.hash;
 
-    return response.status(200).json({ jwt: token, user });
+    return response.status(200).json({ jwt: jwtToken, user });
   } catch (error) {
     sendHttp500({
       errorText: generateErrorText("login", "auth"),
@@ -54,24 +64,8 @@ const register = async (request, response) => {
     let { username, email, firstName, lastName, password, token } =
       request.body;
 
-    const formData = new FormData();
-    formData.append("secret", process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY);
-    formData.append("response", token);
-    const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-    const result = await fetch(url, {
-      body: formData,
-      method: "POST",
-    });
-    const outcome = await result.json();
-    if (!outcome.success) {
-      return response.status(422).json({
-        errors: [
-          {
-            path: "token",
-            customMessage: "Captcha was not verified",
-          },
-        ],
-      });
+    if (!(await Captcha.check(token))) {
+      return sendCaptchaError(response);
     }
 
     const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);

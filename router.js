@@ -40,6 +40,7 @@ export const router = (app) => {
     [
       body("user").trim().isLength({ min: 2, max: 50 }),
       body("password").trim().isStrongPassword({ minSymbols: 0 }),
+      body("token").isLength({ min: 1, max: 2048 }),
     ],
     auth.login
   );
