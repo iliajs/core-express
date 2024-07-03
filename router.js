@@ -12,6 +12,8 @@ import { routes } from "./settings/routes.js";
 import { body, oneOf, param, query } from "express-validator";
 import client from "./controllers/client.js";
 import timeSlot from "./controllers/timeSlot.js";
+import notify from "./controllers/notify.js";
+import email from "./controllers/email.js";
 
 export const router = (app) => {
   // System.
@@ -27,6 +29,7 @@ export const router = (app) => {
       body("firstName").trim(), // TODO Improve .notEmpty(),
       body("lastName").trim(), // TODO Improve .notEmpty(),
       body("password").trim().isStrongPassword({ minSymbols: 0 }),
+      body("token").isLength({ min: 1, max: 2048 }),
     ],
     auth.register
   );
@@ -37,8 +40,27 @@ export const router = (app) => {
     [
       body("user").trim().isLength({ min: 2, max: 50 }),
       body("password").trim().isStrongPassword({ minSymbols: 0 }),
+      body("token").isLength({ min: 1, max: 2048 }),
     ],
     auth.login
+  );
+
+  // Restore password.
+  app.post(
+    routes.restorePassword,
+    [body("email").trim().isEmail()],
+    body("token").isLength({ min: 1, max: 2048 }),
+    auth.restorePassword
+  );
+
+  // Change password.
+  app.post(
+    routes.changePassword,
+    [body("email").isEmail()],
+    [body("rpCode").isUUID()],
+    body("password").trim().isStrongPassword({ minSymbols: 0 }),
+    body("token").isLength({ min: 1, max: 2048 }),
+    auth.changePassword
   );
 
   // Auth user operations.
@@ -140,6 +162,14 @@ export const router = (app) => {
     timeSlot.destroy
   );
 
+  // Emails.
+  // TODO Only for testing now. That's why should be disabled.
+  app.post(
+    routes.confirmEmail,
+    [body("email").isEmail(), body("code").isLength({ min: 6, max: 6 })],
+    email.confirm
+  );
+
   // Words.
   app.post(routes.word, word.create); // TODO Add validation.
 
@@ -159,5 +189,18 @@ export const router = (app) => {
     `${routes.word}/:id`,
     param("id").notEmpty().isUUID(),
     word.destroy
+  );
+
+  // Notify.
+  app.post(
+    routes.notify,
+    [
+      body("token").isUUID(),
+      body("sourceId").isLength({ min: 1, max: 32 }),
+      body("recipientRole").isLength({ min: 1, max: 32 }),
+      body("notifyType").isLength({ min: 1, max: 32 }),
+      body("message").isLength({ min: 1, max: 4096 }),
+    ],
+    notify.run
   );
 };

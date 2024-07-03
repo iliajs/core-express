@@ -2,6 +2,7 @@ import { TelegramApi } from "../api/TelegramApi.js";
 import { UserModel } from "../models/UserModel.js";
 import { TelegramUpdateModel } from "../models/TelegramUpdateModel.js";
 import { TOKEN_TYPES } from "../settings/index.js";
+import { auth, prisma } from "../app.js";
 
 const botTelegram = new TelegramApi();
 const modelTelegramUpdate = new TelegramUpdateModel();
@@ -13,7 +14,7 @@ export class TelegramProcessing {
     const updates = await botTelegram.getUpdates();
 
     // No incoming updates.
-    if (!updates || !updates.length) {
+    if (!updates?.length) {
       return;
     }
 
@@ -50,10 +51,11 @@ export class TelegramProcessing {
     }
 
     // Skip already processed updates.
-    const isProcessed = await modelTelegramUpdate.findProcessed(updateId);
-    if (isProcessed) {
-      return;
-    }
+    // TODO Should be implemented again with prisma;
+    // const isProcessed = await modelTelegramUpdate.findProcessed(updateId);
+    // if (isProcessed) {
+    //   return;
+    // }
 
     console.log(`unprocessed income message, update_id: ${updateId}`);
 
@@ -73,14 +75,17 @@ export class TelegramProcessing {
 
     // Authorization requests.
     if (messageText === "/login") {
-      const token = await modelUser.setLoginToken(
-        telegramUserId,
-        TOKEN_TYPES.oneTime
-      );
-      let answer = "<b>Это ваш одноразовый токен для входа в приложение.</b>";
-      answer += `\n\n*************************************\n** ${token} **\n*************************************`;
-      answer +=
-        "\n\n<i>Действителен 5 минут с момента получения и только для одного входа.</i>";
+      const code = Math.floor(1000 + Math.random() * 9000).toString();
+
+      await prisma.user.update({
+        where: { telegramUserId: from.id.toString() },
+        data: { authCode: code, authCodeTime: new Date() },
+      });
+
+      let answer =
+        "<b>Это ваш одноразовый код для двухфакторной аутентификации:</b>";
+      answer += `\n\n<b>${code}</b>`;
+      answer += "\n\n<i>* Действителен 5 минут с момента получения.</i>";
       const res = botTelegram.sendMessage(telegramUserId, answer);
       if (res) {
         await modelTelegramUpdate.markAsProcessed(updateId);

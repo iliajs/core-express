@@ -9,3 +9,14 @@ export const sendHttp500 = (params) => {
     errorText,
   });
 };
+
+export const sendCaptchaError = (response) => {
+  return response.status(422).json({
+    errors: [
+      {
+        path: "token",
+        customMessage: "Captcha was not verified",
+      },
+    ],
+  });
+};

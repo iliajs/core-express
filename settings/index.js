@@ -3,7 +3,7 @@ import path from "path";
 export const TOKEN_LENGTH = 30;
 export const TOKEN_ALPHABET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-export const TELEGRAM_UPDATE_INTERVAL = 10000;
+export const TELEGRAM_UPDATE_INTERVAL = 5000;
 export const telegramUpdateMethods = {
   webhook: "webhook",
   longPolling: "long_polling",

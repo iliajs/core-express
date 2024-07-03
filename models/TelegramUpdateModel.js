@@ -1,3 +1,5 @@
+import pool from "express";
+
 export class TelegramUpdateModel {
   async markAsProcessed(telegramUpdateId, isDeferred = false) {
     try {

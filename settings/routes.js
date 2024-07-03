@@ -8,6 +8,8 @@ export const routes = {
   auth_with_one_time_token: "/auth-with-one-time-token", // TODO
   register: "/register",
   login: "/login",
+  restorePassword: "/restorePassword",
+  changePassword: "/changePassword",
   authorization: "/authorization",
   getAuthUser: "/getAuthUser",
   saveAuthUserConfig: "/saveAuthUserConfig",
@@ -34,6 +36,12 @@ export const routes = {
   tag: "/tag",
   translation: "/translation",
   word: "/word",
+
+  // Notify.
+  notify: "/notify",
+
+  // Email.
+  confirmEmail: "/confirmEmail",
 };
 
 export const routesWithoutAuthorization = [
@@ -42,5 +50,9 @@ export const routesWithoutAuthorization = [
   routes.login,
   routes.register,
   routes.root, // TODO
-  routes.telegram_webhook,
+  routes.notify,
+  routes.confirmEmail,
+  routes.restorePassword,
+  routes.changePassword,
+  //routes.telegram_webhook, // Switch off for now, use long polling.
 ];

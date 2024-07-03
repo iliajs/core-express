@@ -47,6 +47,7 @@ export class UserModel {
   }
   async setLoginToken(telegramUserId, type) {
     const token = createToken();
+
     try {
       if (type === TOKEN_TYPES.oneTime) {
         await pool.query(
