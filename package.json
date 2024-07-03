@@ -26,7 +26,8 @@
     "lodash": "^4.17.21",
     "node-mailjet": "^6.0.5",
     "node-telegram-bot-api": "^0.56.0",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19",

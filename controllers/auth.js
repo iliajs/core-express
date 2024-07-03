@@ -11,6 +11,7 @@ import { BCRYPT_ROUND_NUMBER } from "../settings/system.js";
 import _ from "lodash";
 import { Email } from "../classes/Email.js";
 import { Captcha } from "../classes/Captcha.js";
+import { v4 as uuidv4 } from "uuid";
 
 const login = async (request, response) => {
   try {
@@ -88,7 +89,7 @@ const register = async (request, response) => {
       });
     }
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const regCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     await prisma.user.create({
       data: {
@@ -97,7 +98,8 @@ const register = async (request, response) => {
         hash,
         username,
         email,
-        authCode: code,
+        regCode,
+        regCodeTime: new Date(),
         active: false,
       },
     });
@@ -108,21 +110,79 @@ const register = async (request, response) => {
       "Confirm Your Email",
       "<h4>Dear customer!</h4>" +
         'We are really happy that you are registered in our application <a href="http://self-platform.es">Self-Platform.es</a>' +
-        `<br/><br/>To confirm your email, please click <a href="http://self-platform.es/login?email=${email}&code=${code}">this link</a>` +
-        "<br /><br/>Thanks a lot and hope see you soon!"
+        `<br/><br/>To confirm your email, please click <a href="http://self-platform.es/login?email=${email}&code=${regCode}">this link</a>`
     );
 
     mailjetRequest
       .then(() => {
-        response.status(200).json({ created: true });
+        return response.status(200).json({ created: true });
       })
       .catch((err) => {
-        response
+        return response
           .status(500)
           .json({ errors: ["Email confirmation code was not sent"] });
       });
 
     response.status(200).json({ created: true });
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("create", "user"),
+      error,
+      response,
+    });
+  }
+};
+
+const restorePassword = async (request, response) => {
+  try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.status(422).json({ errors: validator.array() });
+    }
+
+    const { email, token } = request.body;
+
+    if (!(await Captcha.check(token))) {
+      return sendCaptchaError(response);
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+        active: true,
+      },
+    });
+
+    if (!user) {
+      // We never say to client that this email was not found for security reasons.
+      return response.status(200).json({ success: true });
+    }
+
+    const rpCode = uuidv4();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { rpCode, rpCodeTime: new Date() },
+    });
+
+    const mailjetRequest = Email.send(
+      { email: "registration@self-platform.es", name: "Self-Platform.es" },
+      { email: email },
+      "Restore password",
+      "<h4>Dear customer!</h4>" +
+        "We got request to restore your password." +
+        `<br/><br/>Please, follow <a href="http://self-platform.es/confirmRestorePassword?email=${email}&code=${rpCode}">this link</a> to change your current password` +
+        "<br /><br/>Thanks a lot and hope to see you soon!"
+    );
+
+    mailjetRequest
+      .then(() => {
+        response.status(200).json({ success: true });
+      })
+      .catch((err) => {
+        response
+          .status(500)
+          .json({ errors: ["Restore password code was not sent"] });
+      });
   } catch (error) {
     sendHttp500({
       errorText: generateErrorText("create", "user"),
@@ -169,4 +229,10 @@ const saveAuthUserConfig = async (request, response) => {
   }
 };
 
-export default { register, login, getAuthUser, saveAuthUserConfig };
+export default {
+  register,
+  login,
+  restorePassword,
+  getAuthUser,
+  saveAuthUserConfig,
+};

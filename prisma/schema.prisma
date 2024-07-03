@@ -22,8 +22,12 @@ model User {
   clients      Client[]
   timeSlots    TimeSlot[]
   config       Json?
-  authCode     String?        @db.VarChar(6)
+  authCode     String?        @db.VarChar(4)
   authCodeTime DateTime?      @db.Timestamptz(6)
+  regCode      String?        @db.VarChar(6)
+  regCodeTime  DateTime?      @db.Timestamptz(6)
+  rpCode       String?        @db.Uuid
+  rpCodeTime   DateTime?      @db.Timestamptz(6)
   active       Boolean?
   createdAt    DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime?      @db.Timestamptz(6)

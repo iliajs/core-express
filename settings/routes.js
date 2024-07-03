@@ -8,6 +8,7 @@ export const routes = {
   auth_with_one_time_token: "/auth-with-one-time-token", // TODO
   register: "/register",
   login: "/login",
+  restorePassword: "/restorePassword",
   authorization: "/authorization",
   getAuthUser: "/getAuthUser",
   saveAuthUserConfig: "/saveAuthUserConfig",
@@ -50,5 +51,6 @@ export const routesWithoutAuthorization = [
   routes.root, // TODO
   routes.notify,
   routes.confirmEmail,
+  routes.restorePassword,
   //routes.telegram_webhook, // Switch off for now, use long polling.
 ];

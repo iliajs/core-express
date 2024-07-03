@@ -15,7 +15,7 @@ const confirm = async (request, response) => {
     const user = await prisma.user.findFirst({
       where: {
         email: request.body.email,
-        authCode: request.body.code,
+        regCode: request.body.code,
         active: false,
       },
     });
@@ -23,7 +23,7 @@ const confirm = async (request, response) => {
     if (user) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { active: true, authCode: null },
+        data: { active: true, regCode: null },
       });
 
       response.status(200).json({ success: true });

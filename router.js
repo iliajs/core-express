@@ -45,6 +45,13 @@ export const router = (app) => {
     auth.login
   );
 
+  // Restore password.
+  app.post(
+    routes.restorePassword,
+    [body("email").trim().isEmail()],
+    auth.restorePassword
+  );
+
   // Auth user operations.
   app.get(routes.getAuthUser, auth.getAuthUser);
   app.put(
