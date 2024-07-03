@@ -105,12 +105,12 @@ const register = async (request, response) => {
     });
 
     const mailjetRequest = Email.send(
-      { email: "registration@self-platform.es", name: "Self-Platform.es" },
+      { email: process.env.EMAIL_FROM, name: process.env.EMAIL_FROM_NAME },
       { email },
       "Confirm Your Email",
       "<h4>Dear customer!</h4>" +
-        'We are really happy that you are registered in our application <a href="http://self-platform.es">Self-Platform.es</a>' +
-        `<br/><br/>To confirm your email, please click <a href="http://self-platform.es/login?email=${email}&code=${regCode}">this link</a>`
+        `We are very happy that you are registered on our application <a href="http://${process.env.DOMAIN_NAME}">Self-Platform.es</a>!` +
+        `<br/><br/>To confirm your email, please click <a href="http://${process.env.DOMAIN_NAME}/login?email=${email}&regCode=${regCode}">this link</a>`
     );
 
     mailjetRequest
@@ -165,12 +165,12 @@ const restorePassword = async (request, response) => {
     });
 
     const mailjetRequest = Email.send(
-      { email: "registration@self-platform.es", name: "Self-Platform.es" },
+      { email: process.env.EMAIL_FROM, name: process.env.EMAIL_FROM_NAME },
       { email: email },
       "Restore password",
       "<h4>Dear customer!</h4>" +
         "We got request to restore your password." +
-        `<br/><br/>Please, follow <a href="http://self-platform.es/confirmRestorePassword?email=${email}&code=${rpCode}">this link</a> to change your current password` +
+        `<br/><br/>Please, follow <a href="http://${process.env.DOMAIN_NAME}/changePassword?email=${email}&rpCode=${rpCode}">this link</a> to change your current password` +
         "<br /><br/>Thanks a lot and hope to see you soon!"
     );
 
@@ -183,6 +183,39 @@ const restorePassword = async (request, response) => {
           .status(500)
           .json({ errors: ["Restore password code was not sent"] });
       });
+  } catch (error) {
+    sendHttp500({
+      errorText: generateErrorText("create", "user"),
+      error,
+      response,
+    });
+  }
+};
+
+const changePassword = async (request, response) => {
+  try {
+    const validator = validationResult(request);
+    if (!validator.isEmpty()) {
+      return response.status(422).json({ errors: validator.array() });
+    }
+
+    const { email, password, rpCode, token } = request.body;
+
+    if (!(await Captcha.check(token))) {
+      return sendCaptchaError(response);
+    }
+
+    const salt = bcrypt.genSaltSync(BCRYPT_ROUND_NUMBER);
+    const hash = bcrypt.hashSync(password, salt);
+
+    const res = await prisma.user.update({
+      where: { email, rpCode },
+      data: { rpCode: null, rpCodeTime: null, hash },
+    });
+
+    console.log(res);
+
+    return response.status(200).json({ success: true });
   } catch (error) {
     sendHttp500({
       errorText: generateErrorText("create", "user"),
@@ -233,6 +266,7 @@ export default {
   register,
   login,
   restorePassword,
+  changePassword,
   getAuthUser,
   saveAuthUserConfig,
 };

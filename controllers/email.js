@@ -3,8 +3,6 @@ import { validationResult } from "express-validator";
 import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 
 const confirm = async (request, response) => {
-  console.log(request.body);
-
   try {
     const validator = validationResult(request);
 
@@ -15,7 +13,7 @@ const confirm = async (request, response) => {
     const user = await prisma.user.findFirst({
       where: {
         email: request.body.email,
-        regCode: request.body.code,
+        regCode: request.body.regCode,
         active: false,
       },
     });

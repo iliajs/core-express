@@ -49,7 +49,18 @@ export const router = (app) => {
   app.post(
     routes.restorePassword,
     [body("email").trim().isEmail()],
+    body("token").isLength({ min: 1, max: 2048 }),
     auth.restorePassword
+  );
+
+  // Change password.
+  app.post(
+    routes.changePassword,
+    [body("email").isEmail()],
+    [body("rpCode").isUUID()],
+    body("password").trim().isStrongPassword({ minSymbols: 0 }),
+    body("token").isLength({ min: 1, max: 2048 }),
+    auth.changePassword
   );
 
   // Auth user operations.

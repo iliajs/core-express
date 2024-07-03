@@ -9,6 +9,7 @@ export const routes = {
   register: "/register",
   login: "/login",
   restorePassword: "/restorePassword",
+  changePassword: "/changePassword",
   authorization: "/authorization",
   getAuthUser: "/getAuthUser",
   saveAuthUserConfig: "/saveAuthUserConfig",
@@ -52,5 +53,6 @@ export const routesWithoutAuthorization = [
   routes.notify,
   routes.confirmEmail,
   routes.restorePassword,
+  routes.changePassword,
   //routes.telegram_webhook, // Switch off for now, use long polling.
 ];
