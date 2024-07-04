@@ -166,7 +166,7 @@ export const router = (app) => {
   // TODO Only for testing now. That's why should be disabled.
   app.post(
     routes.confirmEmail,
-    [body("email").isEmail(), body("code").isLength({ min: 6, max: 6 })],
+    [body("email").isEmail(), body("regCode").isLength({ min: 6, max: 6 })],
     email.confirm
   );
 
