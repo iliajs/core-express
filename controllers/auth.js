@@ -110,7 +110,8 @@ const register = async (request, response) => {
       "Confirm Your Email",
       "<h4>Dear customer!</h4>" +
         `We are very happy that you are registered on our application <a href="http://${process.env.DOMAIN_NAME}">Self-Platform.es</a>!` +
-        `<br/><br/>To confirm your email, please click <a href="http://${process.env.DOMAIN_NAME}/login?email=${email}&regCode=${regCode}">this link</a>`
+        `<br/><br/>To confirm your email, please click <a href="http://${process.env.DOMAIN_NAME}/login?email=${email}&regCode=${regCode}">this link</a>` +
+        `<br/>1: ${process.env.DOMAIN_NAME}, 2: ${regCode}, 3: ${regCode}`
     );
 
     mailjetRequest
