@@ -10,6 +10,8 @@ const confirm = async (request, response) => {
       return response.status(422).json({ errors: validator.array() });
     }
 
+    console.log("BEFORE FIND USER");
+
     const user = await prisma.user.findFirst({
       where: {
         email: request.body.email,
@@ -18,15 +20,20 @@ const confirm = async (request, response) => {
       },
     });
 
+    console.log("AFTER FIND USER");
+
     if (user) {
       await prisma.user.update({
         where: { id: user.id },
         data: { active: true, regCode: null },
       });
 
-      response.status(200).json({ success: true });
+      console.log("SUCCESS!");
+
+      return response.status(200).json({ success: true });
     } else {
-      response.status(200).json({ success: false });
+      console.log("FALSE!");
+      return response.status(200).json({ success: false });
     }
   } catch (error) {
     sendHttp500({
