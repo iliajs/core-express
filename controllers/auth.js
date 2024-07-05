@@ -123,8 +123,6 @@ const register = async (request, response) => {
           .status(500)
           .json({ errors: ["Email confirmation code was not sent"] });
       });
-
-    response.status(200).json({ created: true });
   } catch (error) {
     sendHttp500({
       errorText: generateErrorText("create", "user"),
