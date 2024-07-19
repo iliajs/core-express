@@ -194,13 +194,7 @@ export const router = (app) => {
   // Notify.
   app.post(
     routes.notify,
-    [
-      body("token").isUUID(),
-      body("sourceId").isLength({ min: 1, max: 32 }),
-      body("recipientRole").isLength({ min: 1, max: 32 }),
-      body("notifyType").isLength({ min: 1, max: 32 }),
-      body("message").isLength({ min: 1, max: 4096 }),
-    ],
+    [body("token").isUUID(), body("message").isLength({ min: 1, max: 4096 })],
     notify.run
   );
 };

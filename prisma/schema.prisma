@@ -101,3 +101,31 @@ model TimeSlot {
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt DateTime? @db.Timestamptz(6)
 }
+
+model TelegramBot {
+  id                      String                 @id @default(uuid()) @db.Uuid
+  token                   String                 @unique @db.VarChar(46)
+  botName                 String                 @unique @db.VarChar(50)
+  notificationTokens      NotificationToken[]
+  createdAt               DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime?              @db.Timestamptz(6)
+}
+
+model TelegramUser {
+  id              String     @id @default(uuid()) @db.Uuid
+  telegramUserId  String     @unique @db.VarChar(12)
+  fullName        String     @unique @db.VarChar(50)
+  notificationTokens         NotificationToken[]
+  createdAt       DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime?  @db.Timestamptz(6)
+}
+
+model NotificationToken {
+  id              String       @id @default(uuid()) @db.Uuid
+  telegramBot     TelegramBot  @relation(fields: [telegramBotId], references: [id])
+  telegramBotId   String       @db.Uuid
+  telegramUser    TelegramUser @relation(fields: [telegramUserId], references: [id])
+  telegramUserId  String       @db.Uuid
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime?    @db.Timestamptz(6)
+}
