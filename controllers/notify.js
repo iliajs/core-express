@@ -2,6 +2,7 @@ import { generateErrorText, sendHttp500 } from "../helpers/api.js";
 import { validationResult } from "express-validator";
 import { notifySources } from "../settings/notify.js";
 import { TelegramApi } from "../api/TelegramApi.js";
+import { auth, prisma } from "../app.js";
 
 const run = async (request, response) => {
   try {
@@ -10,18 +11,22 @@ const run = async (request, response) => {
       return response.status(422).json({ errors: validator.array() });
     }
 
-    // TODO This check should be in middleware.
-    if (request.body.token !== process.env.SITE_TOKEN) {
-      response.sendStatus(401);
+    const notificationToken = await prisma.notificationToken.findFirst({
+      where: { id: request.body.token },
+    });
+
+    if (!notificationToken) {
+      return response.sendStatus(404);
     }
 
-    const notifyConfig = notifySources[request.body.sourceId];
+    console.log("NOTIF TOKEN", notificationToken);
 
-    console.log("notify", notifyConfig);
-
+    // const notifyConfig = notifySources[request.body.sourceId];
+    //
     const telegram = new TelegramApi();
     await telegram.sendMessage(
-      notifyConfig.telegramUserId,
+      notificationToken.telegramBotId,
+      notificationToken.telegramUserId,
       request.body.message
     );
 
